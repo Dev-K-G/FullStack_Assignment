@@ -67,12 +67,12 @@ async function sendEmail(from, to, subject, message) {
 }
 
 // Example usage
-sendEmail(
-  "from@example.com",
-  "receiver@example.com",
-  "Confirmation Of Event Registration",
-  "Conformation of Event Registration"
-);
+// sendEmail(
+//   "from@example.com",
+//   "receiver@example.com",
+//   "Confirmation Of Event Registration",
+//   "Conformation of Event Registration"
+// );
 
 exports.sendNotification = async (req, res) => {
     const { email, message } = req.body;
