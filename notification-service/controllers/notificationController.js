@@ -34,10 +34,28 @@ smtpClient.verify((error, success) => {
 async function sendEmail(from, to, subject, message) {
   try {
     const result = await smtpClient.sendMail({
-      from: from, //'"Event System" <yourgmail@gmail.com>',
-      to: "receiver@yahoo.com",
-      subject,
-      text: message,
+      from: from,
+      to: to,
+      subject: subject,
+      text: message, // fallback text
+      html: `
+        <div style="font-family: Arial, sans-serif; line-height: 1.6;">          
+          <p>Hello,</p>
+          <p>Thank you for registering for our event.</p>
+          <p><strong>${message}</strong></p>
+
+          <h3>Event Details:</h3>
+          <ul>
+            <li>Status: Confirmed</li>
+            <li>Date: Upcoming</li>
+          </ul>
+
+          <p>If you have any questions, feel free to reply to this email.</p>
+
+          <br/>
+          <p>Best Regards,<br/>Event Team</p>
+        </div>
+      `,
     });
 
     console.log("✅ Email sent successfully:", result.messageId);
@@ -52,7 +70,7 @@ async function sendEmail(from, to, subject, message) {
 sendEmail(
   "from@example.com",
   "receiver@example.com",
-  "Test Email",
+  "Confirmation Of Event Registration",
   "Conformation of Event Registration"
 );
 
@@ -60,7 +78,7 @@ exports.sendNotification = async (req, res) => {
     const { email, message } = req.body;
 
     try {
-        await sendEmail(fromuser, email, "Notification", message);
+        await sendEmail(fromuser, email, "Confirmation Of Event Registration", message);
         res.status(200).json({ message: "Notification sent successfully" });
     } catch (error) {
         console.error("❌ Failed to send notification:", error.message);
