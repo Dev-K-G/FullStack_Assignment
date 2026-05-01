@@ -6,7 +6,8 @@ export default function RegisterForm() {
     name: "",
     email: "",
     phone: "",
-    event: "Tech Talk"
+    event: "Tech Talk",
+    notify: false
   });
 
 const submit = async () => {
@@ -45,6 +46,18 @@ const submit = async () => {
         <option value="Workshop">Workshop</option>
         <option value="Seminar">Seminar</option>
       </select>
+      
+ <label>
+  <input
+    type="checkbox"
+    checked={form.notify}
+    onChange={(e) =>
+      setForm({ ...form, notify: e.target.checked })
+    }
+  />
+  Notify me about future events
+</label>
+       
       <button type="button" onClick={() => submit()}>Register</button>
     </div>
   );

@@ -18,10 +18,15 @@ exports.createEvent = async (req, res) => {
     // ✅ 3. Background job (do NOT await)
     process.nextTick(async () => {
       try {
-        const users = await Registration.find({}, "email");
+        const users = await Registration.find(
+  { notify: true },   // ✅ only subscribed users
+  "email"
+);
+
+
 
         // remove duplicates
-        const emails = [...new Set(users.map(u => u.email))];
+        const emails = [...new Set(users.map(u => u.email.trim().toLowerCase()))];
 
         const message = `
 New Event Created!
@@ -32,10 +37,23 @@ Time: ${event.time}
 Venue: ${event.venue}
         `;
 
+
         // send emails in parallel
-        await Promise.allSettled(
-          emails.map(email => sendNotification(email, message))
-        );
+        // await Promise.allSettled(
+        //   emails.map(email => sendNotification(email, message))
+        // );
+
+        Promise.allSettled(
+  emails.map(email =>
+    sendNotification(
+      email,
+      `New Event: ${event.title}
+Date: ${event.date}
+Time: ${event.time}
+Venue: ${event.venue}`
+    )
+  )
+);
 
         console.log("✅ Emails processed:", emails.length);
 

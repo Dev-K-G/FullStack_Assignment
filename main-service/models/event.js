@@ -7,6 +7,7 @@ const eventSchema = new mongoose.Schema({
   date: { type: String, required: true },   // YYYY-MM-DD
   time: { type: String, required: true },   // HH:MM
   venue: { type: String, required: true },
+  notify: { type: Boolean, default: false },
 
   createdAt: { type: Date, default: Date.now }
 });

@@ -4,6 +4,7 @@ const RegistrationSchema = new mongoose.Schema({
   name: String,
   email: String,
   event: String,
+  notify: Boolean,
   createdAt: {
     type: Date,
     default: Date.now
