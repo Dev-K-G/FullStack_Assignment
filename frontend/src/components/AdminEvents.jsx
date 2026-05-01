@@ -16,6 +16,15 @@ export default function AdminEvents() {
     setEvents(res.data);
   };
 
+    const sendNotification = async (title) => {
+    const res = await axios.get("http://localhost:5001/api/notify", {
+      params: {
+        title: "Event Created: " + title
+      }
+    });
+    setEvents(res.data);
+  };
+
   useEffect(() => {
     fetchEvents();
   }, []);
