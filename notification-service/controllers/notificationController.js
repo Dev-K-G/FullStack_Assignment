@@ -3,38 +3,34 @@ require("dotenv").config();
 
 const fromuser=process.env.email_user;
 const frompass=process.env.email_pass;
+const subject = "Confirmation of Event Registration";
+const message = "Your registration is confirmed!!"
 
 console.log("Email User:", fromuser);
 console.log("Email Pass:", frompass);
 
 // SMTP Transport (Gmail + App Password)
 const smtpClient = nodemailer.createTransport({
-  host: process.env.EMAIL_SERVER_HOST || "smtp.gmail.com",
-  port: process.env.EMAIL_SERVER_PORT || 587, // TLS
-  secure: false, // MUST be false for port 587
+  host: "smtp.gmail.com",
+  port: 587,
+  secure: false,
   auth: {
-    user: fromuser,          // replace with your email
-    pass: frompass,    // Gmail App Password (no spaces)
-  },
-  tls: {
-    minVersion: "TLSv1.2",
+    user: process.env.email_user,
+    pass: process.env.email_pass,
   },
 });
 
 // Optional: verify connection
-smtpClient.verify((error, success) => {
-  if (error) {
-    console.log("❌ SMTP not ready:", error);
-  } else {
-    console.log("✅ SMTP server is ready to send emails");
-  }
+smtpClient.verify((err, success) => {
+  if (err) console.log("SMTP ERROR:", err);
+  else console.log("SMTP READY");
 });
 
 // Send Email Function
-async function sendEmail(from, to, subject, message) {
+async function sendEmail(to) {
   try {
     const result = await smtpClient.sendMail({
-      from: from,
+      from: fromuser,
       to: to,
       subject: subject,
       text: message, // fallback text
@@ -68,20 +64,24 @@ async function sendEmail(from, to, subject, message) {
 
 // Example usage
 // sendEmail(
-//   "from@example.com",
-//   "receiver@example.com",
-//   "Confirmation Of Event Registration",
-//   "Conformation of Event Registration"
+//   "receiver@example.com"
 // );
 
-exports.sendNotification = async (req, res) => {
-    const { email, message } = req.body;
+// exports.sendNotification = async (req, res) => {
+//     const { email, message } = req.body;
 
-    try {
-        await sendEmail(fromuser, email, "Confirmation Of Event Registration", message);
-        res.status(200).json({ message: "Notification sent successfully" });
-    } catch (error) {
-        console.error("❌ Failed to send notification:", error.message);
-        res.status(500).json({ error: "Failed to send notification" });
-    }
+//     try {
+//         await sendEmail(email);
+//         res.status(200).json({ message: "Notification sent successfully" });
+//     } catch (error) {
+//         console.error("❌ Failed to send notification:", error.message);
+//         res.status(500).json({ error: "Failed to send notification" });
+//     }
+// };
+const sendNotification = async (to, message) => {
+  return sendEmail(
+    to
+  );
 };
+
+module.exports = { sendNotification };

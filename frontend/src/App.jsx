@@ -1,5 +1,10 @@
-import Home from "./pages/Home";
+import RegistrationForm from "./components/RegistrationForm.jsx";
 
 export default function App() {
-  return <Home />;
+  return (
+    <div style={{ padding: 20 }}>
+      <h1>Event Registration System</h1>
+      <RegistrationForm />
+    </div>
+  );
 }

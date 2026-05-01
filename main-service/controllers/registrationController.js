@@ -1,9 +1,10 @@
 const Registration = require("../models/Registration.js");
-const { sendEmail } = require("../services/notificationClient.js");
+const { sendNotification } = require('../../notification-service/controllers/notificationController.js')
 
 exports.registerUser = async (req, res) => {
   try {
-    const { name, email, event } = req.body;
+    console.log("Received registration request:", req.body);
+    const { name, email, event } = req.body || {};
 
     const registration = await Registration.create({
       name,
@@ -11,9 +12,9 @@ exports.registerUser = async (req, res) => {
       event,
     });
 
-    await sendEmail(
-      email,
-      `Hi ${name}, you are registered for ${event}`
+    await sendNotification(    
+        email,                                  // to     
+        `Hi ${name}, you are registered for ${event}` // message
     );
 
     res.json({
