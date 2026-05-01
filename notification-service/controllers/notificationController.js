@@ -1,13 +1,20 @@
 const nodemailer = require("nodemailer");
+require("dotenv").config();
+
+const fromuser=process.env.email_user;
+const frompass=process.env.email_pass;
+
+console.log("Email User:", fromuser);
+console.log("Email Pass:", frompass);
 
 // SMTP Transport (Gmail + App Password)
 const smtpClient = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 587, // TLS
+  host: process.env.EMAIL_SERVER_HOST || "smtp.gmail.com",
+  port: process.env.EMAIL_SERVER_PORT || 587, // TLS
   secure: false, // MUST be false for port 587
   auth: {
-    user: "kasturi.intelegencia@gmail.com",          // replace with your email
-    pass: "",    // Gmail App Password (no spaces)
+    user: fromuser,          // replace with your email
+    pass: frompass,    // Gmail App Password (no spaces)
   },
   tls: {
     minVersion: "TLSv1.2",
@@ -24,11 +31,11 @@ smtpClient.verify((error, success) => {
 });
 
 // Send Email Function
-async function sendEmail(to, subject, message) {
+async function sendEmail(from, to, subject, message) {
   try {
     const result = await smtpClient.sendMail({
-      from: '"Event System" <yourgmail@gmail.com>',
-      to:"KasturiM.Sathe@yahoo.com",
+      from: from, //'"Event System" <yourgmail@gmail.com>',
+      to: "receiver@yahoo.com",
       subject,
       text: message,
     });
@@ -43,16 +50,17 @@ async function sendEmail(to, subject, message) {
 
 // Example usage
 sendEmail(
+  "from@example.com",
   "receiver@example.com",
   "Test Email",
-  "Hello! This is a test email from Node.js SMTP with Gmail App Password. Your Event Is Registered!!!!!"
+  "Conformation of Event Registration"
 );
 
 exports.sendNotification = async (req, res) => {
     const { email, message } = req.body;
 
     try {
-        await sendEmail(email, "Notification", message);
+        await sendEmail(fromuser, email, "Notification", message);
         res.status(200).json({ message: "Notification sent successfully" });
     } catch (error) {
         console.error("❌ Failed to send notification:", error.message);
