@@ -1,0 +1,23 @@
+{
+  "name": "fullstack_assignment",
+  "version": "1.0.0",
+  "description": "",
+  "homepage": "https://github.com/Dev-K-G/FullStack_Assignment#readme",
+  "bugs": {
+    "url": "https://github.com/Dev-K-G/FullStack_Assignment/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Dev-K-G/FullStack_Assignment.git"
+  },
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "dotenv": "^17.4.2"
+  }
+}

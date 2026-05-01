@@ -1,0 +1,9 @@
+{
+  "name": "main-service",
+  "dependencies": {
+    "express": "^4.18.2",
+    "mongoose": "^7.0.0",
+    "axios": "^1.5.0",
+    "dotenv": "^16.0.0"
+  }
+}
