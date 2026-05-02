@@ -68,9 +68,9 @@ export default function AdminEvents() {
   // 🔁 SELECT ALL LOGIC
   const handleSelectAll = () => {
     if (selected.length === events.length) {
-      setSelected([]); // unselect all
+      setSelected([]);
     } else {
-      setSelected(events.map((ev) => ev._id)); // select all
+      setSelected(events.map((ev) => ev._id));
     }
   };
 
@@ -91,6 +91,11 @@ export default function AdminEvents() {
 
     setSelected([]);
     fetchEvents();
+  };
+
+  // 🆕 CANCEL SELECTED (NEW)
+  const cancelSelected = () => {
+    setSelected([]);
   };
 
   const handleChange = (field, value) => {
@@ -194,7 +199,6 @@ export default function AdminEvents() {
 
             <thead className="table-dark">
               <tr>
-                {/* SELECT ALL */}
                 <th>
                   <input
                     type="checkbox"
@@ -246,8 +250,17 @@ export default function AdminEvents() {
           </table>
         </div>
 
-        {/* DELETE SELECTED */}
-        <div className="d-flex justify-content-end mt-3">
+        {/* ACTION BUTTONS */}
+        <div className="d-flex justify-content-end gap-2 mt-3">
+
+          <button
+            className="btn btn-outline-secondary"
+            disabled={selected.length === 0}
+            onClick={cancelSelected}
+          >
+            Cancel Selected
+          </button>
+
           <button
             className="btn btn-danger"
             disabled={selected.length === 0}
@@ -255,6 +268,7 @@ export default function AdminEvents() {
           >
             Delete Selected ({selected.length})
           </button>
+
         </div>
 
       </div>

@@ -215,7 +215,7 @@ export default function RegisterForm() {
         ) : (
           <div className="text-center py-5">
             <h4 className="text-success mb-3">
-              🎉 Registration Successful!
+               Registration Successful!
             </h4>
             <p className="text-muted">
               Thank you for registering. We’ll contact you soon.
