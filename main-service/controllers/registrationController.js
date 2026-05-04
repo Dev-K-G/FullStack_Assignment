@@ -27,11 +27,29 @@ exports.registerUser = async (req, res) => {
       }
     };
 
-    await sendNotification(    
-        email,                                  // to     
-        'Event Registration Confirmation',       // subject
-        `Hi ${name.trim()}, you are registered for ${event}` // message
-    );
+process.nextTick(async () => {
+      try {
+        const evnt = await Events.findOne({ eventId: eventId }); 
+        const message = `<p>We are sorry to inform you that the event has been cancelled.</p>
+          <h3>Event Details:</h3>
+          <ul>
+            <li>Title: ${event.title}</li>
+            <li>Date: ${event.date}</li>
+            <li>Time: ${event.time}</li>
+            <li>Venue: ${event.venue}</li>
+          </ul>`;
+          await sendNotification(    
+            email,                                  // to     
+            'Event Registration Confirmation',       // subject
+            message // message
+          );
+
+      } catch (err) {
+        console.error("Subscriber retrieval error:", err.message);
+        return;
+      } 
+    });
+      
 
     res.json({
       success: true,
