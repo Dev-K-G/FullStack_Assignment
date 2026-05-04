@@ -28,7 +28,7 @@ const createMessage = (status, event) => {
       <li>Venue: ${event.venue}</li>
     </ul>          
     <p>Thank you for being with us.</p>
-    <p>You can register here: <a href="http://localhost:5001/events/${event.eventId}">Event Registration</a></p>`;
+    <p>You can register here: <a href="http://localhost:5173/events/${event.eventId}/register">Event Registration</a></p>`;
 
   } else if (status === "updated") {
     subject = "Event Updated!";
@@ -65,11 +65,9 @@ exports.createEvent = async (req, res) => {
     // 4. Background job
     setImmediate(async () => {
       try {
-        const users = await subscribers.find(
-          { notify: true },
-          "email"
-        );
+        const users = await subscribers.find();
 
+        
         if (!users.length) {
           console.log("ℹ️ No subscribed users found");
           return;
@@ -252,7 +250,7 @@ exports.deleteEvent = async (req, res) => {
 exports.updateEventStatus = async (req, res) => {
   try {
     console.log("Received status update request:", req.params.id, req.body);
-    const { status } = req.body;
+    const { status } = req.body.status ? "scheduled" : "";
 
     const event = await Events.findByIdAndUpdate(
       req.params.id,
