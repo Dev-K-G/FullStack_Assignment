@@ -1,11 +1,11 @@
-const Event = require("../models/Event");
+const Events = require("../models/events.js");
 const { sendNotification } = require("../../notification-service/controllers/notificationController.js");
 const Registration = require("../models/Registration");
 const subscribers = require("../models/subscribers.js");
 
 
 const getNextEventId = async () => {
-  const lastEvent = await Event.findOne()
+  const lastEvent = await Events.findOne()
     .sort({ eventId: -1 })
     .lean();
 
@@ -28,7 +28,7 @@ const createMessage = (status, event) => {
       <li>Venue: ${event.venue}</li>
     </ul>          
     <p>Thank you for being with us.</p>
-    <p>You can register here: <a href="http://localhost:3000/events/${event.eventId}">Event Registration</a></p>`;
+    <p>You can register here: <a href="http://localhost:5001/events/${event.eventId}">Event Registration</a></p>`;
 
   } else if (status === "updated") {
     subject = "Event Updated!";
@@ -134,7 +134,7 @@ exports.createEvent = async (req, res) => {
 // READ ALL
 exports.getEvents = async (req, res) => {
   try {
-    const events = await Event.find();
+    const events = await Events.find();
     res.json(events);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -144,7 +144,7 @@ exports.getEvents = async (req, res) => {
 // UPDATE
 exports.updateEvent = async (req, res) => {
   try {
-    const event = await Event.findByIdAndUpdate(
+    const event = await Events.findByIdAndUpdate(
       req.params.id,
       req.body,
       { new: true }
@@ -253,7 +253,7 @@ exports.updateEventStatus = async (req, res) => {
     console.log("Received status update request:", req.params.id, req.body);
     const { status } = req.body;
 
-    const event = await Event.findByIdAndUpdate(
+    const event = await Events.findByIdAndUpdate(
       req.params.id,
       { status },
       { new: true }
@@ -309,6 +309,25 @@ console.log("Prepared message for status update:", message);
       }
     });
 
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+
+// Read Specific Event
+exports.getEvent = async (req, res) => {
+  try {
+    console.log("Received get event request for ID:", req.params.id);
+    const event = await Events.findOne({
+      eventId: req.params.eventId
+    });
+
+    if (!event) {
+      return res.status(404).json({ error: "Event not found" });
+    }
+
+    res.json(event);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

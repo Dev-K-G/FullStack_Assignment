@@ -1,7 +1,5 @@
 import { useState } from "react";
 import axios from "axios";
-import { useParams } from "react-router-dom";
-import { useEffect } from "react";
 
 export default function RegisterForm() {
   const [form, setForm] = useState({
@@ -12,20 +10,9 @@ export default function RegisterForm() {
     notify: false
   });
 
-  const [eventData, setEventData] = useState(null);
   const [errors, setErrors] = useState({});
   const [success, setSuccess] = useState(false);
 
-  const { eventId } = useParams();
-  useEffect(() => {    
-    if (eventId) {
-      axios        .get(`http://localhost:5001/api/events/${eventId}`)
-        .then((res) => setEventData(res.data))
-        .catch((err) => console.error(err));
-    }
-  }, [eventId]);
-
-  
   const validate = () => {
     let newErrors = {};
 
@@ -84,18 +71,7 @@ export default function RegisterForm() {
     Object.values(errors).every((e) => !e);
 
   return (
-    <div className="container d-flex flex-column align-items-center min-vh-100 bg-light py-1">
-
-      {/* TOP: EVENT DETAILS */}
-      {eventData && (
-        <div className="text-center w-100" style={{ maxWidth: "700px" }}>
-          <h3 className="fw-bold">{eventData.title}</h3>
-          <p className="text-muted">
-            {eventData.date} | {eventData.time} | {eventData.venue}
-          </p>
-        </div>
-      )}
-
+    <div className="container d-flex justify-content-center align-items-center min-vh-100 bg-light">
 
       <div className="card shadow p-4 w-100" style={{ maxWidth: "700px" }}>
 
