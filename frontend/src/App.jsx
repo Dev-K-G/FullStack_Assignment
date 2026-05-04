@@ -33,7 +33,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
          <Route path="/events" element={<EventsPage />} />
-         <Route path="/register/:eventId" element={<RegistrationForm />} />
+         <Route path="/events/:eventId/register" element={<RegistrationForm />} />
         <Route path="/admin" element={<AdminEvents />} />
       </Routes>
 

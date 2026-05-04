@@ -50,7 +50,7 @@ export default function EventsPage() {
 
               <td>
                 <Link
-                  to={`/register/${event.eventId}`}
+                  to={`/events/${event.eventId}/register`}
                   className="btn btn-primary btn-sm"
                 >
                   Register
