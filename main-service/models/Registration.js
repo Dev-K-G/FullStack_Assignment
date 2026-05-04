@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 
 const RegistrationSchema = new mongoose.Schema({
+  eventId:{type:Number, required: true},
   name: String,
   email: String,
   event: String,

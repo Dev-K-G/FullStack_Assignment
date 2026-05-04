@@ -4,7 +4,7 @@ require("dotenv").config();
 const fromuser=process.env.email_user;
 const frompass=process.env.email_pass;
 const subject = "Confirmation of Event Registration";
-const message = "Your registration is confirmed!!"
+//const message = "Your registration is confirmed!!"
 
 console.log("Email User:", fromuser);
 console.log("Email Pass:", frompass);
@@ -27,7 +27,7 @@ smtpClient.verify((err, success) => {
 });
 
 // Send Email Function
-async function sendEmail(to) {
+async function sendEmail(to, subject, message) {
   try {
     const result = await smtpClient.sendMail({
       from: fromuser,
@@ -78,9 +78,11 @@ async function sendEmail(to) {
 //         res.status(500).json({ error: "Failed to send notification" });
 //     }
 // };
-const sendNotification = async (to, message) => {
+const sendNotification = async (to, subject,message) => {
   return sendEmail(
-    to
+    to,
+    subject,
+    message
   );
 };
 

@@ -50,6 +50,7 @@ export default function AdminEvents() {
   };
 
   const createEvent = async () => {
+    console.log("Creating event with data:", form);
     const validationErrors = validate();
     setErrors(validationErrors);
 
@@ -97,6 +98,18 @@ export default function AdminEvents() {
   const cancelSelected = () => {
     setSelected([]);
   };
+
+  const updateStatusForSelected = async (status) => {
+  await Promise.all(
+    selected.map((id) =>
+      axios.put(`http://localhost:5001/api/events/${id}`, { status })
+    )
+  );
+
+  setSelected([]);
+  fetchEvents();
+  alert(`Selected events have been ${status}`);
+};
 
   const handleChange = (field, value) => {
     setForm({ ...form, [field]: value });
@@ -254,20 +267,28 @@ export default function AdminEvents() {
         <div className="d-flex justify-content-end gap-2 mt-3">
 
           <button
-            className="btn btn-outline-secondary"
-            disabled={selected.length === 0}
-            onClick={cancelSelected}
-          >
-            Cancel Selected
-          </button>
+  className="btn btn-outline-secondary"
+  disabled={selected.length === 0}
+  onClick={() => updateStatusForSelected("cancelled")}
+>
+  Cancel Selected
+</button>
 
-          <button
-            className="btn btn-danger"
-            disabled={selected.length === 0}
-            onClick={deleteSelected}
-          >
-            Delete Selected ({selected.length})
-          </button>
+<button
+  className="btn btn-outline-secondary"
+  disabled={selected.length === 0}
+  onClick={() => updateStatusForSelected("updated")}
+>
+  Update Selected
+</button>
+
+<button
+  className="btn btn-danger"
+  disabled={selected.length === 0}
+  onClick={() => updateStatusForSelected("deleted")}
+>
+  Delete Selected ({selected.length})
+</button>
 
         </div>
 

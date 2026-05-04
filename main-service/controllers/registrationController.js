@@ -1,4 +1,5 @@
 const Registration = require("../models/Registration.js");
+const subscribers = require("../models/Subscribers.js");
 const { sendNotification } = require("../../notification-service/controllers/notificationController.js");
 
 exports.registerUser = async (req, res) => {
@@ -13,8 +14,20 @@ exports.registerUser = async (req, res) => {
       notify
     });
 
+    if (notify===true) {
+      try {
+        const users = await subscribers.create({ 
+          name: name.trim(),
+          email: email.trim().toLowerCase() 
+        });
+      } catch (err) {
+        console.error("Subscriber creation error (may already exist):", err.message);
+      }
+    };
+
     await sendNotification(    
         email,                                  // to     
+        'Event Registration Confirmation',       // subject
         `Hi ${name.trim()}, you are registered for ${event}` // message
     );
 

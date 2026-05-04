@@ -5,12 +5,13 @@ const {
   createEvent,
   getEvents,
   updateEvent,
-  deleteEvent
+  deleteEvent,
+  updateEventStatus
 } = require("../controllers/eventController");
 
 router.post("/", createEvent);
 router.get("/", getEvents);
-router.put("/:id", updateEvent);
+router.put("/:id", updateEventStatus);
 router.delete("/:id", deleteEvent);
 
 module.exports = router;
