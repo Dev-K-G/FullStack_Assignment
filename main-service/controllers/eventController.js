@@ -51,7 +51,7 @@ exports.createEvent = async (req, res) => {
   try {
    console.log("Received create event request:", req.body);
     const nextEventId = await getNextEventId();   //increment eventId logic    
-    const event = await Event.create({
+    const event = await Events.create({
       ...req.body,
       eventId: nextEventId
     });
@@ -134,6 +134,7 @@ exports.createEvent = async (req, res) => {
 // READ ALL
 exports.getEvents = async (req, res) => {
   try {
+    console.log("Fetching events from server...");
     const events = await Events.find();
     res.json(events);
   } catch (err) {

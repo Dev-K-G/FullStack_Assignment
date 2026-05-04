@@ -2,7 +2,7 @@ const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
 const adminRoutes = require("./routes/adminRoutes.js");
-const eventRoutes = require("./routes/eventRoutes");
+const eventRoutes = require("./routes/eventRoutes.js");
 
 const connectDB = require("./config/db.js");
 const registrationRoutes = require("./routes/registrationRoutes.js");
@@ -19,7 +19,7 @@ app.get("/ping", (req, res) => {
 });
 app.use("/api/register", registrationRoutes);
 app.use("/api/events", eventRoutes);
-//app.use("/api/admin", adminRoutes);
+// app.use("/api/admin", adminRoutes);
 
 const PORT = process.env.PORT || 5001;
 

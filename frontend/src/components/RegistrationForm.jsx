@@ -16,10 +16,11 @@ export default function RegisterForm() {
   const [errors, setErrors] = useState({});
   const [success, setSuccess] = useState(false);
 
+
   const { eventId } = useParams();
   useEffect(() => {    
     if (eventId) {
-      axios        .get(`http://localhost:5001/api/events/${eventId}`)
+      axios.get(`http://localhost:5001/api/events/${eventId}/register`,{...form, eventId: parseInt(eventId) })
         .then((res) => setEventData(res.data))
         .catch((err) => console.error(err));
     }
