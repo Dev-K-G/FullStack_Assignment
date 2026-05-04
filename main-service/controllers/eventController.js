@@ -319,7 +319,7 @@ console.log("Prepared message for status update:", message);
 // Read Specific Event
 exports.getEvent = async (req, res) => {
   try {
-    console.log("Received get event request for ID:", req.params.id);
+    console.log("Received get event request for ID:", req.params.eventId);
     const event = await Events.findOne({
       eventId: req.params.eventId
     });

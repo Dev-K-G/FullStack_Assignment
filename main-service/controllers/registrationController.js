@@ -5,14 +5,15 @@ const { sendNotification } = require("../../notification-service/controllers/not
 exports.registerUser = async (req, res) => {
   try {
     console.log("Received registration request:", req.body);
-    const { eventId, name, email, event, notify} = req.body || {};
+    const { name, email, event, notify, eventId } = req.body || {};
+    // const { eventId } = req.params.eventId || {};
 
-    const registration = await Registration.create({
-      eventId: parent(eventId),
+    const registration = await Registration.create({      
       name:name.trim(), // sanitize name
       email:email.trim().toLowerCase(), // normalize email
       event,
-      notify
+      notify,
+      eventId
     });
 
     if (notify===true) {
