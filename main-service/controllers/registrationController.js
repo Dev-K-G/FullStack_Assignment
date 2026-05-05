@@ -1,5 +1,6 @@
 const Registration = require("../models/Registration.js");
 const subscribers = require("../models/Subscribers.js");
+const eventsModel = require("../models/Events.js");
 const { sendNotification } = require("../../notification-service/controllers/notificationController.js");
 
 exports.registerUser = async (req, res) => {
@@ -7,7 +8,8 @@ exports.registerUser = async (req, res) => {
     console.log("Received registration request:", req.body);
     const { name, email, event, notify, eventId } = req.body || {};
     // const { eventId } = req.params.eventId || {};
-
+    const userEmail =  String(req.body.email || "").trim().toLowerCase();
+console.log("Sanitized email:", email);
     const registration = await Registration.create({      
       name:name.trim(), // sanitize name
       email:email.trim().toLowerCase(), // normalize email
@@ -29,14 +31,14 @@ exports.registerUser = async (req, res) => {
 
 process.nextTick(async () => {
       try {
-        const evnt = await Events.findOne({ eventId: eventId }); 
-        const message = `<p>We are sorry to inform you that the event has been cancelled.</p>
+        const evnt = await eventsModel.findOne({ eventId: eventId }); 
+        const message = `<p>Hello ${name.trim()},</p><p>Thank you for registering for the event.</p>
           <h3>Event Details:</h3>
           <ul>
-            <li>Title: ${event.title}</li>
-            <li>Date: ${event.date}</li>
-            <li>Time: ${event.time}</li>
-            <li>Venue: ${event.venue}</li>
+            <li>Title: ${evnt.title}</li>
+            <li>Date: ${evnt.date}</li>
+            <li>Time: ${evnt.time}</li>
+            <li>Venue: ${evnt.venue}</li>
           </ul>`;
           await sendNotification(    
             email,                                  // to     

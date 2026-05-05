@@ -3,7 +3,7 @@ require("dotenv").config();
 
 const fromuser=process.env.email_user;
 const frompass=process.env.email_pass;
-const subject = "Confirmation of Event Registration";
+//const subject = "Confirmation of Event Registration";
 //const message = "Your registration is confirmed!!"
 
 console.log("Email User:", fromuser);
@@ -27,24 +27,18 @@ smtpClient.verify((err, success) => {
 });
 
 // Send Email Function
-async function sendEmail(to, subject, message) {
+async function sendEmail(touser, emailSubject, message) {
   try {
+    console.log(`Attempting to send email to ${touser} with subject "${emailSubject}"`);
+    console.log("Email content:", message);
     const result = await smtpClient.sendMail({
       from: fromuser,
-      to: to,
-      subject: subject,
+      to: touser,
+      subject: emailSubject,
       text: message, // fallback text
       html: `
-        <div style="font-family: Arial, sans-serif; line-height: 1.6;">          
-          <p>Hello,</p>
-          <p>Thank you for registering for our event.</p>
-          <p><strong>${message}</strong></p>
-
-          <h3>Event Details:</h3>
-          <ul>
-            <li>Status: Confirmed</li>
-            <li>Date: Upcoming</li>
-          </ul>
+        <div style="font-family: Arial, sans-serif; line-height: 1.6;">     
+          <p>${message}</p>
 
           <p>If you have any questions, feel free to reply to this email.</p>
 
@@ -78,10 +72,10 @@ async function sendEmail(to, subject, message) {
 //         res.status(500).json({ error: "Failed to send notification" });
 //     }
 // };
-const sendNotification = async (to, subject,message) => {
+const sendNotification = async (touser, emailSubject,message) => {
   return sendEmail(
-    to,
-    subject,
+    touser,
+    emailSubject,
     message
   );
 };

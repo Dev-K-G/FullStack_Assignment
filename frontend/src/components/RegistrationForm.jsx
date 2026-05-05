@@ -185,8 +185,8 @@ export default function RegisterForm() {
             <div className="row g-3 align-items-center">
 
               <div className="col-md-6">
-                <label className="form-label">Select Event</label>
-                <select
+                <label className="form-label">Event Type</label>
+                <select disabled={true}
                   className="form-select"
                   value={form.event}
                   onChange={(e) =>

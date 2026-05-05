@@ -20,7 +20,7 @@ const createMessage = (status, event) => {
   if (status === "created") {
     subject = "New Event Created!";
     message = `<p>Dear Subscriber,</p><p><strong>New Event Is Created!</strong></p>
-    <h3>Event Details:</h3>'
+    <h3>Event Details:</h3>
     <ul>
       <li>Title: ${event.title}</li>
       <li>Date: ${event.date}</li>
