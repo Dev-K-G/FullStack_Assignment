@@ -1,9 +1,14 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { FaEdit, FaSave, FaTimes } from "react-icons/fa";
 
 export default function AdminEvents() {
   const [events, setEvents] = useState([]);
   const [selected, setSelected] = useState([]);
+
+  //Search, Filter Table
+  const [search, setSearch] = useState("");
+  const [filterType, setFilterType] = useState("All");
 
   const [form, setForm] = useState({
     title: "",
@@ -61,6 +66,70 @@ export default function AdminEvents() {
     fetchEvents();
     resetForm();
   };
+
+  //EDIT EVENT
+const [editingId, setEditingId] = useState(null);
+const [editRow, setEditRow] = useState({});
+const [editErrors, setEditErrors] = useState({});
+const handleEdit = (ev) => {
+  setEditingId(ev._id);
+  setEditRow({ ...ev });
+  setEditErrors({});
+};
+const handleEditChange = (field, value) => {
+  setEditRow({ ...editRow, [field]: value });
+  if (editErrors[field]) {
+    setEditErrors({ ...editErrors, [field]: "" });
+  }
+};
+//Validation in EDIT ROW
+const validateEdit = () => {
+  let errors = {};
+
+  if (!editRow.title?.trim()) errors.title = "Required";
+  if (!editRow.description?.trim()) errors.description = "Required";
+  if (!editRow.date) errors.date = "Required";
+  if (!editRow.time) errors.time = "Required";
+  if (!editRow.venue?.trim()) errors.venue = "Required";
+
+  return errors;
+};
+
+//SAVE RowEdit
+const saveEdit = async () => {
+  const errors = validateEdit();
+  setEditErrors(errors);
+
+  if (Object.keys(errors).length > 0) return;
+
+  // Optimistic UI update
+  const updatedEvents = events.map((ev) =>
+    ev._id === editingId ? { ...editRow } : ev
+  );
+
+  setEvents(updatedEvents);
+
+  try {
+    await axios.put(
+      `http://localhost:5001/api/events/${editingId}`,
+      editRow
+    );
+  } catch (err) {
+    console.error(err);
+    fetchEvents(); // rollback if failed
+  }
+
+  setEditingId(null);
+  setEditRow({});
+};
+
+//CANCEL RowEdit
+const cancelEdit = () => {
+  setEditingId(null);
+  setEditRow({});
+  setEditErrors({});
+};
+
 
   const handleCancel = () => {
     resetForm();
@@ -226,6 +295,7 @@ export default function AdminEvents() {
                 <th>Time</th>
                 <th>Venue</th>
                 <th>Type</th>
+                <th>Actions</th>
               </tr>
             </thead>
 
@@ -238,24 +308,152 @@ export default function AdminEvents() {
                 </tr>
               ) : (
                 events.map((ev) => (
-                  <tr key={ev._id}>
+                  <tr
+  key={ev._id}
+  className={editingId === ev._id ? "table-warning" : ""}
+>
+  {/* SELECT */}
+  <td>
+    <input
+      type="checkbox"
+      checked={selected.includes(ev._id)}
+      onChange={() => toggleSelect(ev._id)}
+    />
+  </td>
 
-                    <td>
-                      <input
-                        type="checkbox"
-                        checked={selected.includes(ev._id)}
-                        onChange={() => toggleSelect(ev._id)}
-                      />
-                    </td>
+  {/* TITLE */}
+  <td>
+    {editingId === ev._id ? (
+      <>
+        <input
+          className="form-control"
+          value={editRow.title}
+          onChange={(e) => handleEditChange("title", e.target.value)}
+        />
+        {editErrors.title && (
+          <small className="text-danger">{editErrors.title}</small>
+        )}
+      </>
+    ) : (
+      ev.title
+    )}
+  </td>
 
-                    <td>{ev.title}</td>
-                    <td>{ev.description}</td>
-                    <td>{ev.date}</td>
-                    <td>{ev.time}</td>
-                    <td>{ev.venue}</td>
-                    <td>{ev.event}</td>
+  {/* DESCRIPTION */}
+  <td>
+    {editingId === ev._id ? (
+      <>
+        <input
+          className="form-control"
+          value={editRow.description}
+          onChange={(e) => handleEditChange("description", e.target.value)}
+        />
+        {editErrors.description && (
+          <small className="text-danger">{editErrors.description}</small>
+        )}
+      </>
+    ) : (
+      ev.description
+    )}
+  </td>
 
-                  </tr>
+  {/* DATE */}
+  <td>
+    {editingId === ev._id ? (
+      <>
+        <input
+          type="date"
+          className="form-control"
+          value={editRow.date}
+          onChange={(e) => handleEditChange("date", e.target.value)}
+        />
+        {editErrors.date && (
+          <small className="text-danger">{editErrors.date}</small>
+        )}
+      </>
+    ) : (
+      ev.date
+    )}
+  </td>
+
+  {/* TIME */}
+  <td>
+    {editingId === ev._id ? (
+      <>
+        <input
+          type="time"
+          className="form-control"
+          value={editRow.time}
+          onChange={(e) => handleEditChange("time", e.target.value)}
+        />
+        {editErrors.time && (
+          <small className="text-danger">{editErrors.time}</small>
+        )}
+      </>
+    ) : (
+      ev.time
+    )}
+  </td>
+
+  {/* VENUE */}
+  <td>
+    {editingId === ev._id ? (
+      <>
+        <input
+          className="form-control"
+          value={editRow.venue}
+          onChange={(e) => handleEditChange("venue", e.target.value)}
+        />
+        {editErrors.venue && (
+          <small className="text-danger">{editErrors.venue}</small>
+        )}
+      </>
+    ) : (
+      ev.venue
+    )}
+  </td>
+
+  {/* TYPE */}
+  <td>
+    {editingId === ev._id ? (
+      <select
+        className="form-select"
+        value={editRow.event}
+        onChange={(e) => handleEditChange("event", e.target.value)}
+      >
+        <option value="Tech Talk">Tech Talk</option>
+        <option value="Workshop">Workshop</option>
+        <option value="Seminar">Seminar</option>
+      </select>
+    ) : (
+      ev.event
+    )}
+  </td>
+
+  {/* ACTIONS (ICONS 🔥) */}
+  <td>
+    {editingId === ev._id ? (
+      <>
+        <FaSave
+          style={{ cursor: "pointer", marginRight: "10px", color: "green" }}
+          onClick={saveEdit}
+          title="Save"
+        />
+        <FaTimes
+          style={{ cursor: "pointer", color: "red" }}
+          onClick={cancelEdit}
+          title="Cancel"
+        />
+      </>
+    ) : (
+      <FaEdit
+        style={{ cursor: "pointer", color: "#f0ad4e" }}
+        onClick={() => handleEdit(ev)}
+        title="Edit"
+      />
+    )}
+  </td>
+</tr>
                 ))
               )}
             </tbody>
