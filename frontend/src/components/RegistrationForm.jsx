@@ -99,7 +99,7 @@ export default function RegisterForm() {
       )}
 
 
-      <div className="card shadow p-4 w-100" style={{ maxWidth: "700px" }}>
+      <div className="card shadow p-4 w-100" style={{ maxWidth: "700px" }} >
 
         {!success ? (
           <>
