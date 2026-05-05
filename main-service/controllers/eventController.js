@@ -1,7 +1,7 @@
 const Events = require("../models/events.js");
 const { sendNotification } = require("../../notification-service/controllers/notificationController.js");
-const Registration = require("../models/Registration");
 const subscribers = require("../models/subscribers.js");
+const Registrations = require("../models/Registration.js");
 
 
 const getNextEventId = async () => {
@@ -143,22 +143,28 @@ exports.getEvents = async (req, res) => {
 // UPDATE
 exports.updateEvent = async (req, res) => {
   try {
+    console.log("Received update event updateEvent request for ID: ", req.params._id, req.body);
+    console.log("Request body:", req.params.editedId);
     const event = await Events.findByIdAndUpdate(
-      req.params.id,
+      {_id: req.body._id},
       req.body,
       { new: true }
     );
     res.json(event);
-
+    console.log("Event updated successfully:", event);
+    
     // 3. Background job (do NOT await)
     process.nextTick(async () => {
       try {
-            const users = await Registration.find(
-            { notify: true },   //  only subscribed users
-            "email"
+            const users = await Registrations.find(
+            {eventId : event.eventId},                // filter by eventId
+            { notify: true }  //  only subscribed users
             );
+
+             const subscriberUsers = await subscribers.find();           
+            
         // remove duplicates
-        const emails = [...new Set(users.map(u => u.email.trim().toLowerCase()))];
+        const emails = users? [...new Set(users.map(u => u.email.trim().toLowerCase()))] : [];
         const message = `Event Updated!
             Title: ${event.title}
             Date: ${event.date}
@@ -174,10 +180,7 @@ exports.updateEvent = async (req, res) => {
           emails.map(email =>
           sendNotification(
           email,
-          // `New Event: ${event.title}
-          //   Date: ${event.date}
-          //   Time: ${event.time}
-          //   Venue: ${event.venue}`
+          "Event Updated!",
           message
           )
     )
@@ -197,14 +200,14 @@ exports.updateEvent = async (req, res) => {
 // DELETE
 exports.deleteEvent = async (req, res) => {
   try {
-    await Event.findByIdAndDelete(req.params.id);
+    await Events.findByIdAndDelete(req.params.id);
     res.json({ message: "Event deleted" });
 
     if (status === "cancelled") {
       // 3. Background job (do NOT await)
     process.nextTick(async () => {
       try {
-            const users = await Registration.find(
+            const users = await Registrations.find(
             { notify: true },   //  only subscribed users
             "email"
             );
@@ -249,23 +252,22 @@ exports.deleteEvent = async (req, res) => {
 
 exports.updateEventStatus = async (req, res) => {
   try {
-    console.log("Received status update request:", req.params.id, req.body);
+    console.log("Received status update request:", req.params._id, req.body);
     const { status } = req.body.status ? "scheduled" : "";
-
-    const event = await Events.findByIdAndUpdate(
-      req.params.id,
-      { status },
-      { new: true }
-    );
+    await Events.findByIdAndUpdate(
+  {_id: req.params._id},
+  req.body,
+  { new: true }
+);
 
     res.json(event);
     
 
     process.nextTick(async () => {
       try {
-        const users = await Registration.find({ notify: true }, "email");
+        const users = await Registrations.find({ notify: true }, "email");
 
-        const emails = [...new Set(users.map(u => u.email.trim().toLowerCase()))];
+        const emails = users? [...new Set(users.map(u => u.email.trim().toLowerCase()))] : [];
 
         let message = "";
 

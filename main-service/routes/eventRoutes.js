@@ -13,7 +13,7 @@ const {
 router.post("/", createEvent);
 router.get("/", getEvents);
 router.get("/:eventId/register", getEvent);
-router.put("/:id", updateEventStatus);
+router.put("/:editingId", updateEvent);
 router.delete("/:id", deleteEvent);
 
 module.exports = router;

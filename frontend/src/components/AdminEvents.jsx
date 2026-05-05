@@ -164,13 +164,13 @@ const cancelEdit = () => {
   };
 
   // 🔁 SELECT ALL LOGIC
-  const handleSelectAll = () => {
-    if (selected.length === events.length) {
-      setSelected([]);
-    } else {
-      setSelected(events.map((ev) => ev._id));
-    }
-  };
+const handleSelectAll = () => {
+  if (selected.length === currentEvents.length) {
+    setSelected([]);
+  } else {
+    setSelected(currentEvents.map((ev) => ev._id));
+  }
+};
 
   const toggleSelect = (id) => {
     if (selected.includes(id)) {
@@ -428,7 +428,7 @@ const cancelEdit = () => {
         <input
           type="date"
           className="form-control"
-          value={editRow.date}
+          value={editRow.date?.slice(0, 10)}
           onChange={(e) => handleEditChange("date", e.target.value)}
         />
         {editErrors.date && (
@@ -525,7 +525,9 @@ const cancelEdit = () => {
           </table>
         </div>
 
-        <div className="d-flex justify-content-center mt-3 gap-2">
+              <div className="d-flex justify-content-center mt-3 gap-2 align-items-center">
+
+  {/* PREV */}
   <button
     className="btn btn-outline-secondary"
     disabled={currentPage === 1}
@@ -534,10 +536,25 @@ const cancelEdit = () => {
     Prev
   </button>
 
-  <span className="align-self-center">
-    Page {currentPage} of {totalPages || 1}
-  </span>
+  {/* PAGE NUMBERS */}
+  {[...Array(totalPages)].map((_, index) => {
+    const page = index + 1;
+    return (
+      <button
+        key={page}
+        className={`btn ${
+          currentPage === page
+            ? "btn-primary"
+            : "btn-outline-secondary"
+        }`}
+        onClick={() => setCurrentPage(page)}
+      >
+        {page}
+      </button>
+    );
+  })}
 
+  {/* NEXT */}
   <button
     className="btn btn-outline-secondary"
     disabled={currentPage === totalPages || totalPages === 0}
@@ -545,6 +562,7 @@ const cancelEdit = () => {
   >
     Next
   </button>
+
 </div>
 
         {/* ACTION BUTTONS */}
@@ -558,18 +576,18 @@ const cancelEdit = () => {
   Cancel Selected
 </button>
 
-<button
+{/* <button
   className="btn btn-outline-secondary"
   disabled={selected.length === 0}
   onClick={() => updateStatusForSelected("updated")}
 >
   Update Selected
-</button>
+</button> */}
 
 <button
   className="btn btn-danger"
   disabled={selected.length === 0}
-  onClick={() => updateStatusForSelected("deleted")}
+  onClick={deleteSelected}
 >
   Delete Selected ({selected.length})
 </button>
