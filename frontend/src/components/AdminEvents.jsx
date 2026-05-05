@@ -10,6 +10,10 @@ export default function AdminEvents() {
   const [search, setSearch] = useState("");
   const [filterType, setFilterType] = useState("All");
 
+  //Pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const eventsPerPage = 5;
+
   const [form, setForm] = useState({
     title: "",
     description: "",
@@ -29,6 +33,10 @@ export default function AdminEvents() {
   useEffect(() => {
     fetchEvents();
   }, []);
+  //Pagination, Search, Filter
+  useEffect(() => {
+  setCurrentPage(1);
+}, [search, filterType]);
 
   const validate = () => {
     let newErrors = {};
@@ -94,6 +102,26 @@ const validateEdit = () => {
 
   return errors;
 };
+
+//Sear, Filter Table
+const filteredEvents = events.filter((ev) => {
+  const matchesSearch =
+    ev.title.toLowerCase().includes(search.toLowerCase()) ||
+    ev.description.toLowerCase().includes(search.toLowerCase()) ||
+    ev.venue.toLowerCase().includes(search.toLowerCase());
+
+  const matchesType =
+    filterType === "All" || ev.event === filterType;
+
+  return matchesSearch && matchesType;
+});
+
+//Pagination
+const indexOfLast = currentPage * eventsPerPage;
+const indexOfFirst = indexOfLast - eventsPerPage;
+const currentEvents = filteredEvents.slice(indexOfFirst, indexOfLast);
+const totalPages = Math.ceil(filteredEvents.length / eventsPerPage);
+
 
 //SAVE RowEdit
 const saveEdit = async () => {
@@ -271,12 +299,32 @@ const cancelEdit = () => {
         </div>
       </div>
 
+      
       {/* TABLE */}
       <div className="card shadow p-3">
 
         <h4 className="mb-3">Events List</h4>
 
         <div className="table-responsive">
+          <div className="d-flex gap-2 mb-3">
+  <input
+    className="form-control"
+    placeholder="Search events..."
+    value={search}
+    onChange={(e) => setSearch(e.target.value)}
+  />
+
+  <select
+    className="form-select"
+    value={filterType}
+    onChange={(e) => setFilterType(e.target.value)}
+  >
+    <option value="All">All</option>
+    <option value="Tech Talk">Tech Talk</option>
+    <option value="Workshop">Workshop</option>
+    <option value="Seminar">Seminar</option>
+  </select>
+</div>
           <table className="table table-hover align-middle">
 
             <thead className="table-dark">
@@ -300,18 +348,34 @@ const cancelEdit = () => {
             </thead>
 
             <tbody>
-              {events.length === 0 ? (
+              {/* {events.length === 0 ? (
                 <tr>
-                  <td colSpan="7" className="text-center text-muted">
+                  <td colSpan="" className="text-center text-muted">
                     No events found
                   </td>
                 </tr>
               ) : (
                 events.map((ev) => (
                   <tr
-  key={ev._id}
-  className={editingId === ev._id ? "table-warning" : ""}
->
+                  key={ev._id}
+                  className={editingId === ev._id ? "table-warning" : ""}
+                  > */}
+                  
+              {filteredEvents.length === 0 ? (
+                <tr>
+                  <td colSpan="8" className="text-center text-muted">
+                  No events found
+                  </td>
+                </tr>
+                ) : (
+                  currentEvents.map((ev) => (
+                  <tr
+                  key={ev._id}
+                  className={editingId === ev._id ? "table-warning" : ""}
+                  >
+    
+  
+
   {/* SELECT */}
   <td>
     <input
@@ -460,6 +524,28 @@ const cancelEdit = () => {
 
           </table>
         </div>
+
+        <div className="d-flex justify-content-center mt-3 gap-2">
+  <button
+    className="btn btn-outline-secondary"
+    disabled={currentPage === 1}
+    onClick={() => setCurrentPage(currentPage - 1)}
+  >
+    Prev
+  </button>
+
+  <span className="align-self-center">
+    Page {currentPage} of {totalPages || 1}
+  </span>
+
+  <button
+    className="btn btn-outline-secondary"
+    disabled={currentPage === totalPages || totalPages === 0}
+    onClick={() => setCurrentPage(currentPage + 1)}
+  >
+    Next
+  </button>
+</div>
 
         {/* ACTION BUTTONS */}
         <div className="d-flex justify-content-end gap-2 mt-3">
