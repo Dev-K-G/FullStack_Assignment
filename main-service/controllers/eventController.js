@@ -14,6 +14,19 @@ const getNextEventId = async () => {
   return Number.isFinite(lastId) ? lastId + 1 : 1;
 };
 
+const getEmails = async (status, eventId) => {
+  
+  const subs = await subscribers.find({}, { email: 1, _id: 0 });
+  let emails = subs.map(u => u.email.trim().toLowerCase());
+
+        if (status === "cancelled") {
+          const regs = await Registrations.find({ eventId: eventId });
+          const regEmails = regs.map(u => u.email.trim().toLowerCase());
+          emails = [...new Set([...emails, ...regEmails])];
+        }
+  return emails;
+}
+
 //create messag based on event status : created, updated, cancelled, deleted
 const createMessage = (status, event) => {
   let subject, message = "";
@@ -32,7 +45,7 @@ const createMessage = (status, event) => {
 
   } else if (status === "updated") {
     subject = "Event Updated!";
-    message = `<p>Dear Subscriber,</p><p><strong>Please Note: Below Event Has Been Updated!</strong></p>
+    message = `<p>Dear User,</p><p><strong>Please Note: Below Event Has Been Updated!</strong></p>
     <h3>Event Details:</h3>
     <ul>
       <li>Title: ${event.title}</li>
@@ -41,8 +54,22 @@ const createMessage = (status, event) => {
       <li>Venue: ${event.venue}</li>
     </ul>
     <p>Thank you for being with us.</p>`;
-  }
+  } else 
+        if (status === "cancelled") {
+          subject = "Event Cancelled!";
+          message = `<p>Dear User,</p><p><strong>We regret to inform you that the following event has been cancelled.</strong></p>
+          <h3>Event Details:</h3>
+          <ul>
+            <li>Title: ${event.title}</li>
+            <li>Date: ${event.date}</li>
+            <li>Time: ${event.time}</li>
+            <li>Venue: ${event.venue}</li>
+          </ul>
+          <p>We apologize for any inconvenience caused.</p>`;
+          
+        }
 
+  console.log("Generated message for status:", status, "\nSubject:", subject, "\nMessage:", message);
   return { subject, message };
 };
 
@@ -56,23 +83,20 @@ exports.createEvent = async (req, res) => {
       eventId: nextEventId
     });
 
-    // 3. Send response immediately
+    // Send response immediately
     res.status(201).json({
       success: true,
       data: event
     });
 
-    // 4. Background job
+    // Background job
     setImmediate(async () => {
       try {
-        const users = await subscribers.find();
-
-        
+        const users = await subscribers.find();        
         if (!users.length) {
           console.log("ℹ️ No subscribed users found");
           return;
         }
-
         const emails = [
           ...new Set(
             users
@@ -81,16 +105,12 @@ exports.createEvent = async (req, res) => {
               .map(e => e.trim().toLowerCase())
           )
         ];
-
         if (!emails.length) {
           console.log("ℹ️ No valid emails to send");
           return;
-        }
-
-        
+        }       
 
         const { subject, message } = createMessage("created", event);
-
         const results = await Promise.allSettled(
           emails.map(email => sendNotification(email, subject, message))
         );
@@ -142,56 +162,44 @@ exports.getEvents = async (req, res) => {
 
 // UPDATE
 exports.updateEvent = async (req, res) => {
-  try {
-    console.log("Received update event updateEvent request for ID: ", req.params._id, req.body);
+  try {    
+    console.log("Received update event updateEvent request for ID: ", req.params.editingId, req.body);
     console.log("Request body:", req.params.editedId);
     const event = await Events.findByIdAndUpdate(
-      {_id: req.body._id},
+      {_id: req.params.editingId},
       req.body,
       { new: true }
     );
     res.json(event);
     console.log("Event updated successfully:", event);
     
-    // 3. Background job (do NOT await)
+    // Background job (do NOT await)
     process.nextTick(async () => {
       try {
-            const users = await Registrations.find(
-            {eventId : event.eventId},                // filter by eventId
-            { notify: true }  //  only subscribed users
-            );
+        const emails = getEmails(event.status, req.body.eventId);
+        //emails = registeredEmails ? [...new Set([...registeredEmails, subscribersEmails])] : emails;
+        console.log("Emails to notify for event update:", emails);        
+        if(emails && emails.length > 0)
+        {
+          const {subject, message} = createMessage(req.body.status || "active", event);
+          const result = await Promise.allSettled(
+            emails.map(email =>
+              sendNotification(
+              email,
+              "Event Updated!",
+              message
+              )
+            )
+          );
+          const successCount = result.filter(r => r.status === "fulfilled").length;
+          const failCount = result.filter(r => r.status === "rejected").length;
+          console.log(`✅ Emails sent: ${successCount}, ❌ Failed: ${failCount}`);
+        }           
 
-             const subscriberUsers = await subscribers.find();           
-            
-        // remove duplicates
-        const emails = users? [...new Set(users.map(u => u.email.trim().toLowerCase()))] : [];
-        const message = `Event Updated!
-            Title: ${event.title}
-            Date: ${event.date}
-            Time: ${event.time}
-            Venue: ${event.venue}
-          `;
-        // send emails in parallel
-        // await Promise.allSettled(
-        //   emails.map(email => sendNotification(email, message))
-        // );
-
-        Promise.allSettled(
-          emails.map(email =>
-          sendNotification(
-          email,
-          "Event Updated!",
-          message
-          )
-    )
-);
-        console.log("✅ Emails processed:", emails.length);
       } catch (err) {
         console.error("❌ Background email error:", err.message);
       }
     });
-
-
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -202,48 +210,6 @@ exports.deleteEvent = async (req, res) => {
   try {
     await Events.findByIdAndDelete(req.params.id);
     res.json({ message: "Event deleted" });
-
-    if (status === "cancelled") {
-      // 3. Background job (do NOT await)
-    process.nextTick(async () => {
-      try {
-            const users = await Registrations.find(
-            { notify: true },   //  only subscribed users
-            "email"
-            );
-        // remove duplicates
-        const emails = [...new Set(users.map(u => u.email.trim().toLowerCase()))];
-        const message = `New Event Created!
-            Title: ${event.title}
-            Date: ${event.date}
-            Time: ${event.time}
-            Venue: ${event.venue}
-          `;
-        // send emails in parallel
-        // await Promise.allSettled(
-        //   emails.map(email => sendNotification(email, message))
-        // );
-
-        Promise.allSettled(
-          emails.map(email =>
-          sendNotification(
-          email,
-          // `New Event: ${event.title}
-          //   Date: ${event.date}
-          //   Time: ${event.time}
-          //   Venue: ${event.venue}`
-          message
-          )
-    )
-);
-        console.log("✅ Emails processed:", emails.length);
-      } catch (err) {
-        console.error("❌ Background email error:", err.message);
-      }
-    });
-    }
-
-
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -253,58 +219,56 @@ exports.deleteEvent = async (req, res) => {
 exports.updateEventStatus = async (req, res) => {
   try {
     console.log("Received status update request:", req.params._id, req.body);
-    const { status } = req.body.status ? "scheduled" : "";
-    await Events.findByIdAndUpdate(
-  {_id: req.params._id},
-  req.body,
-  { new: true }
-);
-
-    res.json(event);
-    
+    const { status } = req.body.status ? req.body.status : "active" ;
+//     await Events.findByIdAndUpdate(
+//   {_id: req.params._id},
+//   req.body,
+//   { new: true }
+// );
+//res.json({ message: "Event updated" });
+  res.json(event);   
 
     process.nextTick(async () => {
-      try {
-        const users = await Registrations.find({ notify: true }, "email");
+      try {     
+        
+        const event = await Events.findOne({eventId: req.body.eventId});
+        const emails = getEmails(event.status, event.eventId);
 
-        const emails = users? [...new Set(users.map(u => u.email.trim().toLowerCase()))] : [];
+        // const subscribersEmails = await subscribers.find().project({ email: 1, _id: 0 }).toArray();
+        // const emails = subscribersEmails ? [...new Set(subscribersEmails.map(u => u.email.trim().toLowerCase()))] : [];
 
-        let message = "";
+        // if (status === "cancelled") {
+        // const registeredUsers = await Registrations.find({ eventId: event.eventId });
+        // const registeredEmails = registeredUsers? [...new Set(registeredUsers.map(u => u.email.trim().toLowerCase()))] : [];
+          
+        // emails = registeredEmails ? [...new Set([...registeredEmails, subscribersEmails])] : emails;
+        //console.log("Emails to notify for event cancellation:", emails);
+          
+          // message = `<p>We are sorry to inform you that the event has been cancelled.</p>
+          // <h3>Event Details:</h3>
+          // <ul>
+          //   <li>Title: ${event.title}</li>
+          //   <li>Date: ${event.date}</li>
+          //   <li>Time: ${event.time}</li>
+          //   <li>Venue: ${event.venue}</li>
+          // </ul>          
+          // `;       
 
-        if (status === "cancelled") {
-          message = `<p>We are sorry to inform you that the event has been cancelled.</p>
-          <h3>Event Details:</h3>
-          <ul>
-            <li>Title: ${event.title}</li>
-            <li>Date: ${event.date}</li>
-            <li>Time: ${event.time}</li>
-            <li>Venue: ${event.venue}</li>
-          </ul>          
-          `;
-        }
+        //}
+        
+        if(emails && emails.length > 0)
+        {
+          const {subject, message} = createMessage(req.body.status || "active", event);
+          await Promise.allSettled(
+            emails.map(email => sendNotification(email, status, message))
+          );
+          const successCount = result.filter(r => r.status === "fulfilled").length;
+          const failCount = result.filter(r => r.status === "rejected").length;
+          console.log(`✅ Emails sent: ${successCount}, ❌ Failed: ${failCount}`);
+          console.log("✅ Emails processed:", emails.length);
+        }   
 
-        if (status === "updated") {
-          message = `<p>Thank you for registering for our event.</p><p><strong>Event Updated!</strong></p>
-          <h3>Event Details:</h3>
-          <ul>
-            <li>Title: ${event.title}</li>
-            <li>Date: ${event.date}</li>
-            <li>Time: ${event.time}</li>
-            <li>Venue: ${event.venue}</li>
-          </ul>          
-          `; 
-        }
-
-        if (status === "deleted") {
-          message = `Event Deleted!
-Title: ${event.title}`;
-        }
-console.log("Prepared message for status update:", message);
-        await Promise.allSettled(
-          emails.map(email => sendNotification(email, status, message))
-        );
-
-        console.log("✅ Emails processed:", emails.length);
+        
       } catch (err) {
         console.error("❌ Background email error:", err.message);
       }

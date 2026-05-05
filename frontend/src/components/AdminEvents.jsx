@@ -132,15 +132,24 @@ const saveEdit = async () => {
 
   // Optimistic UI update
   const updatedEvents = events.map((ev) =>
-    ev._id === editingId ? { ...editRow } : ev
+    ev._id === editingId ? { ...editRow } : ev    
   );
-
+editRow.status=="updated";
   setEvents(updatedEvents);
+  // try{
+  //   updateStatusForSelected("updated");
+  // }
+  // catch (err) {
+  //   console.error(err);
+  //   fetchEvents(); // rollback if failed
+  // }
+  
+  alert("Saving edit:", editingId, editRow.status);
 
   try {
     await axios.put(
       `http://localhost:5001/api/events/${editingId}`,
-      editRow
+      { ...editRow, status: "updated" }
     );
   } catch (err) {
     console.error(err);
@@ -196,16 +205,24 @@ const handleSelectAll = () => {
     setSelected([]);
   };
 
-  const updateStatusForSelected = async (status) => {
-  await Promise.all(
-    selected.map((id) =>
-      axios.put(`http://localhost:5001/api/events/${id}`, { status })
+  const updateStatusForSelected = async (selected, status) => {
+    try{
+      await Promise.all(
+    selected.map((_id) =>
+      axios.put(`http://localhost:5001/api/events/${_id}`, { ...selected, status })
     )
   );
 
   setSelected([]);
   fetchEvents();
   alert(`Selected events have been ${status}`);
+
+    }
+    catch(err)
+    {
+      console.error("Error updating status for selected events:", err);
+      return;
+    }
 };
 
   const handleChange = (field, value) => {
@@ -571,7 +588,7 @@ const handleSelectAll = () => {
           <button
   className="btn btn-outline-secondary"
   disabled={selected.length === 0}
-  onClick={() => updateStatusForSelected("cancelled")}
+  onClick={() => {selected.status = "cancelled"; updateStatusForSelected(selected, "cancelled")}}
 >
   Cancel Selected
 </button>
@@ -587,7 +604,7 @@ const handleSelectAll = () => {
 <button
   className="btn btn-danger"
   disabled={selected.length === 0}
-  onClick={deleteSelected}
+  onClick={() => {updateStatusForSelected("deleted")}}
 >
   Delete Selected ({selected.length})
 </button>

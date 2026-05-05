@@ -14,6 +14,7 @@ router.post("/", createEvent);
 router.get("/", getEvents);
 router.get("/:eventId/register", getEvent);
 router.put("/:editingId", updateEvent);
+router.put("/:_id", updateEventStatus);
 router.delete("/:id", deleteEvent);
 
 module.exports = router;
