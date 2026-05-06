@@ -27,21 +27,9 @@ const getEmails = async (status, eventId) => {
   return emails;
 }
 
-const emailTemplate = async(status, event) => {
-  console.log("Preparing email template for status:", status, "and event:", event);
-  const emails = await getEmails(status, event.eventId);
-
-      if(emails && emails.length > 0)
-        {
-          const {subject, message} = createMessage(status, event);
-          const result =await Promise.allSettled(
-            emails.map(email => sendNotification(email, subject, message))
-          );
-          const successCount = result.filter(r => r.status === "fulfilled").length;
-          const failCount = result.filter(r => r.status === "rejected").length;
-          console.log(`✅ Emails sent: ${successCount}, ❌ Failed: ${failCount}`);
-          console.log("✅ Emails processed:", emails.length);
-        }
+const emailTemplate = (status, event) => {
+  if (status === "cancelled") {
+  }
 }
 
 //create messag based on event status : created, updated, cancelled, deleted
@@ -56,7 +44,6 @@ const createMessage = (status, event) => {
       <li>Date: ${event.date}</li>
       <li>Time: ${event.time}</li>
       <li>Venue: ${event.venue}</li>
-      <li>Event Type: ${event.event}</li>
     </ul>          
     <p>Thank you for being with us.</p>
     <p>You can register here: <a href="http://localhost:5173/events/${event.eventId}/register">Event Registration</a></p>`;
@@ -70,7 +57,6 @@ const createMessage = (status, event) => {
       <li>Date: ${event.date}</li>
       <li>Time: ${event.time}</li>
       <li>Venue: ${event.venue}</li>
-      <li>Event Type: ${event.event}</li>
     </ul>
     <p>Thank you for being with us.</p>`;
   } else 
@@ -83,7 +69,6 @@ const createMessage = (status, event) => {
             <li>Date: ${event.date}</li>
             <li>Time: ${event.time}</li>
             <li>Venue: ${event.venue}</li>
-            <li>Event Type: ${event.event}</li>
           </ul>
           <p>We apologize for any inconvenience caused.</p>`;
           
@@ -196,7 +181,26 @@ exports.updateEvent = async (req, res) => {
     // Background job (do NOT await)
     process.nextTick(async () => {
       try {
-        emailTemplate("updated", event);        
+        const emails = getEmails(event.status, req.body.eventId);
+        //emails = registeredEmails ? [...new Set([...registeredEmails, subscribersEmails])] : emails;
+        console.log("Emails to notify for event update:", emails);        
+        if(emails && emails.length > 0)
+        {
+          const {subject, message} = createMessage(req.body.status || "active", event);
+          const result = await Promise.allSettled(
+            emails.map(email =>
+              sendNotification(
+              email,
+              "Event Updated!",
+              message
+              )
+            )
+          );
+          const successCount = result.filter(r => r.status === "fulfilled").length;
+          const failCount = result.filter(r => r.status === "rejected").length;
+          console.log(`✅ Emails sent: ${successCount}, ❌ Failed: ${failCount}`);
+        }           
+
       } catch (err) {
         console.error("❌ Background email error:", err.message);
       }
@@ -209,22 +213,7 @@ exports.updateEvent = async (req, res) => {
 // DELETE
 exports.deleteEvent = async (req, res) => {
   try {
-    console.log("Event deleted successfully, ID:", req.params.id);
-    if (req.body.status == "cancelled") 
-    {
-      console.log("Received delete event request for ID: ", req.params.id, "with status:", req.body.status);
-      const event = await Events.findOne({ _id: req.params.id });
-      if (!event) {
-        return res.status(404).json({ error: "Event not found" });
-      }
-      process.nextTick(async () => {
-        try {
-          emailTemplate("cancelled", event);        
-        } catch (err) {
-          console.error("❌ Background email error:", err.message);
-        }
-      });
-    }
+    console.log("Event deleted successfully, ID:", req.body, req.params.id);
     await Events.findByIdAndDelete(req.params.id);
     
     res.json({ message: "Event deleted" });
@@ -247,9 +236,46 @@ exports.updateEventStatus = async (req, res) => {
   res.json(event);   
 
     process.nextTick(async () => {
-      try {   
+      try {     
+        
         const event = await Events.findOne({eventId: req.body.eventId});
-        emailTemplate("updated", event);        
+        const emails = getEmails(event.status, event.eventId);
+
+        // const subscribersEmails = await subscribers.find().project({ email: 1, _id: 0 }).toArray();
+        // const emails = subscribersEmails ? [...new Set(subscribersEmails.map(u => u.email.trim().toLowerCase()))] : [];
+
+        // if (status === "cancelled") {
+        // const registeredUsers = await Registrations.find({ eventId: event.eventId });
+        // const registeredEmails = registeredUsers? [...new Set(registeredUsers.map(u => u.email.trim().toLowerCase()))] : [];
+          
+        // emails = registeredEmails ? [...new Set([...registeredEmails, subscribersEmails])] : emails;
+        //console.log("Emails to notify for event cancellation:", emails);
+          
+          // message = `<p>We are sorry to inform you that the event has been cancelled.</p>
+          // <h3>Event Details:</h3>
+          // <ul>
+          //   <li>Title: ${event.title}</li>
+          //   <li>Date: ${event.date}</li>
+          //   <li>Time: ${event.time}</li>
+          //   <li>Venue: ${event.venue}</li>
+          // </ul>          
+          // `;       
+
+        //}
+        
+        if(emails && emails.length > 0)
+        {
+          const {subject, message} = createMessage(req.body.status || "active", event);
+          await Promise.allSettled(
+            emails.map(email => sendNotification(email, status, message))
+          );
+          const successCount = result.filter(r => r.status === "fulfilled").length;
+          const failCount = result.filter(r => r.status === "rejected").length;
+          console.log(`✅ Emails sent: ${successCount}, ❌ Failed: ${failCount}`);
+          console.log("✅ Emails processed:", emails.length);
+        }   
+
+        
       } catch (err) {
         console.error("❌ Background email error:", err.message);
       }

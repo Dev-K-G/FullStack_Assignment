@@ -189,10 +189,10 @@ const handleSelectAll = () => {
     }
   };
 
-  const deleteSelected = async () => {
+  const deleteSelected = async (action) => {
     await Promise.all(
       selected.map((id) =>
-        axios.delete(`http://localhost:5001/api/events/${id}`)
+        axios.delete(`http://localhost:5001/api/events/${id}`, { data: { status: action } })
       )
     );
 
@@ -588,7 +588,7 @@ const handleSelectAll = () => {
           <button
   className="btn btn-outline-secondary"
   disabled={selected.length === 0}
-  onClick={() => {selected.status = "cancelled"; updateStatusForSelected(selected, "cancelled")}}
+  onClick={() => {selected.status = "cancelled"; deleteSelected("cancelled")}}
 >
   Cancel Selected
 </button>
@@ -604,7 +604,7 @@ const handleSelectAll = () => {
 <button
   className="btn btn-danger"
   disabled={selected.length === 0}
-  onClick={() => {updateStatusForSelected("deleted")}}
+  onClick={() => {selected.status = "deleted"; deleteSelected()}}
 >
   Delete Selected ({selected.length})
 </button>

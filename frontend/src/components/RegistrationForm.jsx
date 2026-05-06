@@ -8,7 +8,7 @@ export default function RegisterForm() {
     name: "",
     email: "",
     phone: "",
-    event: "Tech Talk",
+    event: "",
     notify: false
   });
 
@@ -193,9 +193,9 @@ export default function RegisterForm() {
                     setForm({ ...form, event: e.target.value })
                   }
                 >
-                  <option value="Tech Talk">Tech Talk</option>
+                  {/* <option value="Tech Talk">Tech Talk</option>
                   <option value="Workshop">Workshop</option>
-                  <option value="Seminar">Seminar</option>
+                  <option value="Seminar">Seminar</option> */}
                 </select>
               </div>
 
