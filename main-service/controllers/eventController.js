@@ -3,9 +3,11 @@ const { sendNotification } = require("../../notification-service/controllers/not
 const subscribers = require("../models/subscribers.js");
 const Registrations = require("../models/Registration.js");
 const jwt = require("jsonwebtoken");
+require("dotenv").config();
 
+import axios from "../utils/axiosConfig";
 const generateUnsubToken = (email) => {
-  return jwt.sign({ email }, "SECRET_KEY", { expiresIn: "7d" });
+  return jwt.sign({ email }, process.env.JWSKEY , { expiresIn: "7d" });
 };
 
 const getNextEventId = async () => {
