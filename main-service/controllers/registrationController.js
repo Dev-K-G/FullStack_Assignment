@@ -1,7 +1,11 @@
+const ExcelJS = require("exceljs");
+
+
 const Registration = require("../models/Registration.js");
 const subscribers = require("../models/Subscribers.js");
 const eventsModel = require("../models/Events.js");
 const { sendNotification } = require("../../notification-service/controllers/notificationController.js");
+const Registrations = require("../models/Registration.js");
 
 exports.registerUser = async (req, res) => {
   try {
@@ -74,47 +78,52 @@ exports.getRegisteredUsers = async (req, res) => {
   }
 };
 
-const XLSX = require("xlsx");
-const Registrations = require("../models/Registration.js");
-
+// Download to Excel
 exports.exportRegistrations = async (req, res) => {
   try {
     const { eventId } = req.params;
 
     const data = await Registrations.find({ eventId });
 
-    if (!data.length) {
+    if (!data || data.length === 0) {
       return res.status(404).json({ message: "No registrations found" });
     }
 
-    // Convert JSON → worksheet
-    const worksheet = XLSX.utils.json_to_sheet(
-      data.map((u) => ({
-        Name: u.name,
-        Email: u.email,
-        Phone: u.phone,
-        Notify: u.notify ? "Yes" : "No",
-      }))
-    );
+    const workbook = new ExcelJS.Workbook();
+    const sheet = workbook.addWorksheet("Registrations");
 
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Registrations");
+    sheet.columns = [
+      { header: "Name", key: "name", width: 20 },
+      { header: "Email", key: "email", width: 30 },
+      { header: "Phone", key: "phone", width: 15 },
+      { header: "Notify", key: "notify", width: 10 },
+    ];
 
-    const buffer = XLSX.write(workbook, {
-      type: "buffer",
-      bookType: "xlsx",
+    data.forEach((u) => {
+      sheet.addRow({
+        name: u.name,
+        email: u.email,
+        phone: u.phone,
+        notify: u.notify ? "Yes" : "No",
+      });
     });
+
+    // Make header bold
+    sheet.getRow(1).font = { bold: true };
 
     res.setHeader(
       "Content-Disposition",
       `attachment; filename=event_${eventId}_registrations.xlsx`
     );
+
     res.setHeader(
       "Content-Type",
       "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     );
 
-    res.send(buffer);
+    await workbook.xlsx.write(res);
+    res.end();
+
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

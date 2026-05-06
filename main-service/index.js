@@ -3,6 +3,8 @@ const cors = require("cors");
 require("dotenv").config();
 const subscriberRoutes = require("./routes/subscriberRoutes.js");
 const eventRoutes = require("./routes/eventRoutes.js");
+//const loginRoutes = require("./routes/loginRoutes.js");
+const adminRoutes = require("./routes/adminRoutes.js");
 
 const connectDB = require("./config/db.js");
 const registrationRoutes = require("./routes/registrationRoutes.js");
@@ -20,6 +22,10 @@ app.get("/ping", (req, res) => {
 app.use("/api/register", registrationRoutes);
 app.use("/api/events", eventRoutes);
 app.use("/api/subscribers", subscriberRoutes);
+
+//Login Page
+//app.use("/api/login", loginRoutes);
+app.use("/api/admin", adminRoutes);
 
 const PORT = process.env.PORT || 5001;
 

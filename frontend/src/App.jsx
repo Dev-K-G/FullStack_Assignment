@@ -5,6 +5,7 @@ import EventsPage from "./components/EventsPage.jsx";
 import HomePage from "./components/HomePage.jsx";
 import UnsubscribePage from "./components/Unsubscribe.jsx";
 import EventRegistrations from "./components/EventRegistrations.jsx"
+import LoginPage from "./components/LoginPage.jsx"
 import { Home } from "lucide-react";
 
 export default function App() {
@@ -27,7 +28,7 @@ export default function App() {
             Events
           </Link>
 
-          <Link className="nav-link" to="/admin">
+          <Link className="nav-link" to="/admin/login">
             Admin
           </Link>
         </div>
@@ -41,6 +42,7 @@ export default function App() {
         <Route path="/admin" element={<AdminEvents />} />
         <Route path="/subscribers/unsubscribe" element={<UnsubscribePage />} />
         <Route path="/admin/events/:eventId/registrations" element={<EventRegistrations />} />
+        <Route path="/admin/login" element={<LoginPage />} />
       </Routes>
 
     </BrowserRouter>

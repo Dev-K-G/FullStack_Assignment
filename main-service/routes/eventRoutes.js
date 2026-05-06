@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const { verifyAdmin } = require("../middleware/auth.js");
 
 const {
   createEvent,
@@ -10,14 +11,19 @@ const {
   updateEventStatus
 } = require("../controllers/eventController");
 
-router.post("/", createEvent);
+router.post("/", verifyAdmin, createEvent);
 
 router.get("/", getEvents);
 router.get("/:eventId", getEvent);
 router.get("/:eventId/register", getEvent);
 
-router.put("/:editingId", updateEvent);
-router.put("/:_id", updateEventStatus);
-router.delete("/:id", deleteEvent);
+router.put("/:editingId", verifyAdmin, updateEvent);
+router.put("/:_id", verifyAdmin, updateEventStatus);
+router.delete("/:id", verifyAdmin, deleteEvent);
+
+// protect create/update/delete
+// router.post("/", verifyAdmin, createEvent);
+// router.put("/:id", verifyAdmin, updateEvent);
+// router.delete("/:id", verifyAdmin, deleteEvent);
 
 module.exports = router;

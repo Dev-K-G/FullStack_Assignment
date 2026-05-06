@@ -36,7 +36,7 @@ export default function AdminEvents() {
     const dateA = new Date(`${a.date?.slice(0, 10)}T${a.time || "00:00"}`);
     const dateB = new Date(`${b.date?.slice(0, 10)}T${b.time || "00:00"}`);
 
-    return dateB.getTime() - dateA.getTime(); // ascending (old → new)
+    return dateB.getTime() - dateA.getTime(); // ascending (new → old)
   });
   setEvents(sorted);
 
