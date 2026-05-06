@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { FaEdit, FaSave, FaTimes } from "react-icons/fa";
 
+
 export default function AdminEvents() {
   const [events, setEvents] = useState([]);
   const [selected, setSelected] = useState([]);
@@ -17,7 +18,7 @@ export default function AdminEvents() {
   const [form, setForm] = useState({
     title: "",
     description: "",
-    date: "",
+    date: new Date().toISOString().split("T")[0],
     time: "",
     venue: "",
     event: "Tech Talk"
@@ -244,77 +245,111 @@ const handleSelectAll = () => {
   return (
     <div className="container py-4">
 
-      {/* FORM */}
+      {/* CREATE EVENT FORM */}
       <div className="card p-4 shadow mb-4">
-        <h3 className="text-center mb-3">Admin Events</h3>
+  <h3 className="text-center mb-3">Admin Events</h3>
 
-        <input
-          className="form-control mb-2"
-          placeholder="Title"
-          value={form.title}
-          onChange={(e) => handleChange("title", e.target.value)}
-        />
-        {errors.title && <small className="text-danger">{errors.title}</small>}
+  {/* Title */}
+  <input
+    className="form-control mb-2"
+    placeholder="Title"
+    maxLength={40}
+    value={form.title}
+    onChange={(e) => handleChange("title", e.target.value)}
+  />
+  {errors.title && <small className="text-danger">{errors.title}</small>}
 
-        <input
-          className="form-control mb-2"
-          placeholder="Description"
-          value={form.description}
-          onChange={(e) => handleChange("description", e.target.value)}
-        />
-        {errors.description && <small className="text-danger">{errors.description}</small>}
+  {/* Description (scrollable textarea) */}
+  <textarea
+    className="form-control mb-2"
+    placeholder="Description"
+    maxLength={200}
+    rows={4}
+    style={{ maxHeight: "150px", overflowY: "auto", resize: "none" }}
+    value={form.description}
+    onChange={(e) => handleChange("description", e.target.value)}
+  />
+  {errors.description && (
+            <small className="text-danger">{errors.description}</small>
+          )}
+          <small className="text-muted d-block text-end">
+            {form.description.length}/200
+          </small>
+  
 
-        <input
-          className="form-control mb-2"
-          type="date"
-          value={form.date}
-          onChange={(e) => handleChange("date", e.target.value)}
-        />
-        {errors.date && <small className="text-danger">{errors.date}</small>}
+  {/* Date & Time in one row */}
+  <div className="row">
+    <div className="col-md-6">
+      <input
+        className="form-control mb-2"
+        type="date"        
+        value={form.date}
+        onChange={(e) => handleChange("date", e.target.value)}
+      />
+      {errors.date && <small className="text-danger">{errors.date}</small>}
+    </div>
 
-        <input
-          className="form-control mb-2"
-          type="time"
-          value={form.time}
-          onChange={(e) => handleChange("time", e.target.value)}
-        />
-        {errors.time && <small className="text-danger">{errors.time}</small>}
+    <div className="col-md-6">
+      <input
+        className="form-control mb-2"
+        type="time"
+        value={form.time}
+        onChange={(e) => handleChange("time", e.target.value)}
+      />
+      {errors.time && <small className="text-danger">{errors.time}</small>}
+    </div>
+  </div>
 
-        <input
-          className="form-control mb-2"
-          placeholder="Venue"
-          value={form.venue}
-          onChange={(e) => handleChange("venue", e.target.value)}
-        />
-        {errors.venue && <small className="text-danger">{errors.venue}</small>}
+  {/* Venue & Event Type in one row */}
+  <div className="row">
+    <div className="col-md-6">
+      <input
+        className="form-control mb-2"
+        placeholder="Venue"
+        maxLength={50}
+        value={form.venue}
+        onChange={(e) => handleChange("venue", e.target.value)}
+      />
+      {errors.venue && <small className="text-danger">{errors.venue}</small>}
+    </div>
 
-        <select
-          className="form-select mb-3"
-          value={form.event}
-          onChange={(e) => handleChange("event", e.target.value)}
-        >
-          <option value="Tech Talk">Tech Talk</option>
-          <option value="Workshop">Workshop</option>
-          <option value="Seminar">Seminar</option>
-        </select>
+    <div className="col-md-6">
+      <select
+        className="form-select mb-2"
+        value={form.event}
+        onChange={(e) => handleChange("event", e.target.value)}
+      >
+        <option value="Tech Talk">Tech Talk</option>
+        <option value="Workshop">Workshop</option>
+        <option value="Seminar">Seminar</option>
+      </select>
+    </div>
 
-        <div className="d-flex gap-2">
-          <button
-            className="btn btn-outline-secondary w-50"
-            onClick={handleCancel}
-          >
-            Cancel
-          </button>
+    {/* Validation Error Message for Event Type (if needed) */}
+     
 
-          <button
-            className="btn btn-primary w-50"
-            onClick={createEvent}
-            disabled={!isValid}
-          >
-            Create Event
-          </button>
-        </div>
-      </div>
+      
+
+  </div>
+
+  {/* Buttons */}
+  <div className="d-flex gap-2 mt-3">
+    <button
+      className="btn btn-outline-secondary w-50"
+      onClick={handleCancel}
+    >
+      Cancel
+    </button>
+
+    <button
+      className="btn btn-primary w-50"
+      onClick={createEvent}
+      disabled={!isValid}
+    >
+      Create Event
+    </button>
+  </div>
+</div>
 
       
       {/* TABLE */}
