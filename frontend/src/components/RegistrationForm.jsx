@@ -15,14 +15,22 @@ export default function RegisterForm() {
   const [eventData, setEventData] = useState(null);
   const [errors, setErrors] = useState({});
   const [success, setSuccess] = useState(false);
+  const [notFound, setNotFound] = useState(false);
 
 
   const { eventId } = useParams();
   useEffect(() => {    
     if (eventId) {
       axios.get(`http://localhost:5001/api/events/${eventId}/register`,{...form, eventId: parseInt(eventId) })
-        .then((res) => setEventData(res.data))
-        .catch((err) => console.error(err));
+        .then((res) => {
+          setEventData(res.data);
+          setNotFound(false);
+        })
+        .catch((err) => {
+          console.error(err);
+          setEventData(null);
+          setNotFound(true);
+        });
     }
   }, [eventId]);
 
@@ -89,7 +97,12 @@ export default function RegisterForm() {
         <div className="row g-4">
               {/* LEFT: EVENT DETAILS */}
     <div className="col-md-4">
-      {eventData && (
+      {notFound ? (
+        <div className="alert alert-warning">
+          Event not found
+        </div>
+      ) : 
+      eventData && (
         <div className="card shadow p-3 sticky-top">
            <h5 className="border-bottom pb-2 mt-4 mb-3">
               Event Details

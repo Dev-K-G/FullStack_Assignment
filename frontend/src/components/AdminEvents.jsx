@@ -304,7 +304,7 @@ const handleSelectAll = () => {
         className="form-control mb-2"
         type="date"        
         value={form.date}
-        max={today}
+        min={today}
         onChange={(e) => handleChange("date", e.target.value)}
       />
       {errors.date && <small className="text-danger">{errors.date}</small>}
@@ -518,7 +518,7 @@ const handleSelectAll = () => {
           type="date"
           className="form-control"
           value={editRow.date?.slice(0, 10)}
-          max={today}
+          min={today}
           onChange={(e) => handleEditChange("date", e.target.value)}
         />
         {editErrors.date && (

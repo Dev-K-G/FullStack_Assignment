@@ -18,15 +18,45 @@ const getNextEventId = async () => {
   return Number.isFinite(lastId) ? lastId + 1 : 1;
 };
 
-const getEmails = async (status, eventId) => {
-  
-  const subs = await subscribers.find({}, { email: 1, _id: 0 });
-  let emails = subs.map(u => u.email.trim().toLowerCase());
+const getAllSubscribers = async () => {
+  try {
+    const subs = await subscribers.find({}, { email: 1, _id: 0 });
 
-        if (status === "cancelled") {
-          const regs = await Registrations.find({ eventId: eventId });
-          const regEmails = regs.map(u => u.email.trim().toLowerCase());
-          emails = [...new Set([...emails, ...regEmails])];
+let subEmails = Array.isArray(subs)
+  ? subs.map(u => u.email?.trim().toLowerCase()).filter(Boolean)
+  : [];
+    // if (!Array.isArray(subs) || subs.length === 0) {
+    //   console.log("No subscribers found");
+    //   return [];
+    // }
+    // return subs
+    //   .map(u => u.email)
+    //   .filter(Boolean)
+    //   .map(e => e.trim().toLowerCase());
+
+    return subEmails;
+
+  } catch (err) {
+    console.error("Error fetching subscribers:", err.message);
+    return []; 
+  }
+};
+
+const getEmails = async (status, eventId) => {
+  console.log("Getting Emails..");
+  //const subs = await subscribers.find({}, { email: 1, _id: 0 });
+  let {subEmails, email} = [];
+  subEmails = getAllSubscribers() //subs ? subs.map(u => u.email.trim().toLowerCase()) : [];
+
+        if (status === "cancelled" || status === "updated") {
+          const regs = await Registrations.find({ eventId });
+          const regEmails = Array.isArray(regs)
+            ? regs.map(u => u.email?.trim().toLowerCase()).filter(Boolean)
+            : [];
+          
+          const safeSub = Array.isArray(subEmails) ? subEmails : [];
+          const safeReg = Array.isArray(regEmails) ? regEmails : [];
+          emails = [...new Set([...safeSub, ...safeReg])];
         }
   return emails;
 }
@@ -128,7 +158,7 @@ exports.createEvent = async (req, res) => {
           )
         ];
         if (!emails.length) {
-          console.log("ℹ️ No valid emails to send");
+          console.log("No valid emails to send");
           return;
         }       
 
@@ -136,7 +166,7 @@ exports.createEvent = async (req, res) => {
         const results = await Promise.allSettled(
             emails.map(email => {
               const token = generateUnsubToken(email);
-              const unsubscribeLink = `http://localhost:5173/unsubscribe?token=${token}`;
+              const unsubscribeLink = `http://localhost:5173/subscribers/unsubscribe?token=${token}`;
               // const unsubscribeLink = `http://localhost:5173/unsubscribe?email=${encodeURIComponent(email)}`;
             
               const finalMessage = `

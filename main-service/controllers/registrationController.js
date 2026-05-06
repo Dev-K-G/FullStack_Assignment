@@ -31,18 +31,20 @@ console.log("Sanitized email:", email);
 
 process.nextTick(async () => {
       try {
-        const evnt = await eventsModel.findOne({ eventId: eventId }); 
+        const event = await eventsModel.findOne({ eventId: eventId }); 
         const message = `<p>Hello ${name.trim()},</p><p>Thank you for registering for the event.</p>
           <h3>Event Details:</h3>
-          <ul>
-            <li>Title: ${evnt.title}</li>
-            <li>Date: ${evnt.date}</li>
-            <li>Time: ${evnt.time}</li>
-            <li>Venue: ${evnt.venue}</li>
-          </ul>`;
+           <ul>
+             <li>Title: ${event.title}</li>
+             <li>Description: ${event.description}</li>
+             <li>Date: ${event.date}</li>
+             <li>Time: ${event.time}</li>
+             <li>Venue: ${event.venue}</li>
+             <li>Event Type: ${event.event}</li>
+           </ul>`;
           await sendNotification(    
             email,                                  // to     
-            'Event Registration Confirmation',       // subject
+            'Event Registration Confirmation!',       // subject
             message // message
           );
 
