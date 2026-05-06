@@ -36,7 +36,7 @@ export default function UnsubscribeForm() {
             <div className="form-check d-flex justify-content-center mb-3">
               <input type="checkbox" className="form-check-input" checked disabled />
               <label className="form-check-label ms-2">
-                Receive event notifications
+                Unsubscribe me from receiving event notifications
               </label>
             </div>
 
