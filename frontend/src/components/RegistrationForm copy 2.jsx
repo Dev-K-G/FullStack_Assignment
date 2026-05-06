@@ -70,7 +70,8 @@ export default function RegisterForm() {
     setForm({
       name: "",
       email: "",
-      phone: "",      
+      phone: "",
+      event: "Tech Talk",
       notify: false
     });
     setErrors({});
@@ -97,7 +98,7 @@ export default function RegisterForm() {
           <h4 className="fw-bold">{eventData.title}</h4>
 
           <p className="text-muted mb-1">
-            <strong>Type:</strong> {eventData.event}
+            <strong>Type:</strong> {eventData.type}
           </p>
 
           <p className="text-muted mb-1">
@@ -112,25 +113,12 @@ export default function RegisterForm() {
             <strong>Venue:</strong> {eventData.venue}
           </p>
           
-          {/* Description */}
-          <div className="mb-2">
-            <p className="text-muted mb-1">
-              <strong>Description:</strong>
-            </p>
-            <div
-              className="form-control bg-light"
-              style={{
-                maxHeight: "120px",
-                overflowY: "auto",
-                whiteSpace: "pre-wrap"
-              }}
-            >
-              {eventData.description}
-            </div>
-          </div>
-      </div>
-    )}
-  </div>        
+          <p className="text-muted">
+            <strong>Description:</strong> {eventData.description}
+          </p>
+        </div>
+      )}
+    </div>        
 
       
 {/* RIGHT: USER FORM */}
@@ -192,7 +180,7 @@ export default function RegisterForm() {
               </div>
 
               {/* Phone */}
-              <div className="col-6">
+              <div className="col-12">
                 <label className="form-label">Phone</label>
                 <input
                   className="form-control"
@@ -212,8 +200,30 @@ export default function RegisterForm() {
                 )}
               </div>
 
-              {/* Notify Checkbox */}
-              <div className="col-md-6 align-items-center d-flex">
+            </div>
+
+            <h5 className="border-bottom pb-2 mt-4 mb-3">
+              Event Details
+            </h5>
+
+            <div className="row g-3 align-items-center">
+
+              <div className="col-md-6">
+                <label className="form-label">Event Type</label>
+                <select disabled={true}
+                  className="form-select"
+                  value={form.event}
+                  onChange={(e) =>
+                    setForm({ ...form, event: e.target.value })
+                  }
+                >
+                  {/* <option value="Tech Talk">Tech Talk</option>
+                  <option value="Workshop">Workshop</option>
+                  <option value="Seminar">Seminar</option> */}
+                </select>
+              </div>
+
+              <div className="col-md-6 mt-4">
                 <div className="form-check">
                   <input
                     type="checkbox"
@@ -228,11 +238,11 @@ export default function RegisterForm() {
                   </label>
                 </div>
               </div>
+
             </div>
 
-            
-          {/* Action Buttons */}
             <div className="d-flex gap-2 mt-4">
+
               <button
                 type="button"
                 onClick={handleCancel}
