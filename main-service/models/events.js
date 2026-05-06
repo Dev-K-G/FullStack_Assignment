@@ -15,7 +15,7 @@ const eventSchema = new mongoose.Schema({
   default: "active"
 },
   createdAt: { type: Date, default: Date.now }
-});
+}, {versionKey: false});
 
 module.exports =
   mongoose.models.Events || mongoose.model("Events", eventSchema);

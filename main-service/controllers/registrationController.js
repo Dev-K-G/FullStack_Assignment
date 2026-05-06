@@ -64,3 +64,58 @@ process.nextTick(async () => {
     res.status(500).json({ error: "Registration failed" });
   }
 };
+
+exports.getRegisteredUsers = async (req, res) => {
+  try {
+    const users = await Registration.find({ eventId: req.params.eventId });
+    res.json(users);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+const XLSX = require("xlsx");
+const Registrations = require("../models/Registration.js");
+
+exports.exportRegistrations = async (req, res) => {
+  try {
+    const { eventId } = req.params;
+
+    const data = await Registrations.find({ eventId });
+
+    if (!data.length) {
+      return res.status(404).json({ message: "No registrations found" });
+    }
+
+    // Convert JSON → worksheet
+    const worksheet = XLSX.utils.json_to_sheet(
+      data.map((u) => ({
+        Name: u.name,
+        Email: u.email,
+        Phone: u.phone,
+        Notify: u.notify ? "Yes" : "No",
+      }))
+    );
+
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Registrations");
+
+    const buffer = XLSX.write(workbook, {
+      type: "buffer",
+      bookType: "xlsx",
+    });
+
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename=event_${eventId}_registrations.xlsx`
+    );
+    res.setHeader(
+      "Content-Type",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    );
+
+    res.send(buffer);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};

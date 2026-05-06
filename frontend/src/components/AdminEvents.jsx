@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { FaEdit, FaSave, FaTimes } from "react-icons/fa";
+import { Link } from "react-router-dom";
 import "../styles/adminEvent.css"; // Import custom CSS for styling
 
 
@@ -461,13 +462,11 @@ const handleSelectAll = () => {
 {/* EVENT ID */}
 <td>
   {editingId === ev._id ? (
-    <input
-      className="form-control"
-      value={editRow.eventId}
-      disabled
-    />
+    <input className="form-control" value={editRow.eventId} disabled />
   ) : (
-    ev.eventId
+    <Link to={`/admin/events/${ev.eventId}/registrations`}>
+      {ev.eventId}
+    </Link>
   )}
 </td>
 

@@ -11,8 +11,11 @@ const {
 } = require("../controllers/eventController");
 
 router.post("/", createEvent);
+
 router.get("/", getEvents);
+router.get("/:eventId", getEvent);
 router.get("/:eventId/register", getEvent);
+
 router.put("/:editingId", updateEvent);
 router.put("/:_id", updateEventStatus);
 router.delete("/:id", deleteEvent);
