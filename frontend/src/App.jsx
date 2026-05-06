@@ -3,6 +3,7 @@ import RegistrationForm from "./components/RegistrationForm.jsx";
 import AdminEvents from "./components/AdminEvents.jsx";
 import EventsPage from "./components/EventsPage.jsx";
 import HomePage from "./components/HomePage.jsx";
+import UnsubscribePage from "./components/Unsubscribe.jsx";
 import { Home } from "lucide-react";
 
 export default function App() {
@@ -37,6 +38,7 @@ export default function App() {
          <Route path="/events" element={<EventsPage />} />
          <Route path="/events/:eventId/register" element={<RegistrationForm />} />
         <Route path="/admin" element={<AdminEvents />} />
+        <Route path="/subscribers/unsubscribe" element={<UnsubscribePage />} />
       </Routes>
 
     </BrowserRouter>

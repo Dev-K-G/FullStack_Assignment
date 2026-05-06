@@ -30,17 +30,7 @@ export default function AdminEvents() {
 
   const fetchEvents = async () => {
     const res = await axios.get("http://localhost:5001/api/events");
-
-  const sorted = res.data.sort((a, b) => {
-    const dateA = new Date(`${a.date?.slice(0, 10)}T${a.time || "00:00"}`);
-    const dateB = new Date(`${b.date?.slice(0, 10)}T${b.time || "00:00"}`);
-
-    return dateB.getTime() - dateA.getTime(); // ascending (old → new)
-  });
-  setEvents(sorted);
-
-
-    // setEvents(res.data);
+    setEvents(res.data);
   };
 
   useEffect(() => {
@@ -69,7 +59,7 @@ export default function AdminEvents() {
       title: "",
       description: "",
       date: today,
-      time: "00:00",
+      time: "",
       venue: "",
       event: "Tech Talk"
     });
@@ -162,16 +152,10 @@ editRow.status=="updated";
   alert("Saving edit:", editingId, editRow.status);
 
   try {
-    const {eventId, ...safeData} = editRow; // Exclude eventId from the update payload
     await axios.put(
       `http://localhost:5001/api/events/${editingId}`,
-      { ...safeData, status: "updated" }
+      { ...editRow, status: "updated" }
     );
-    // OR
-    // await axios.put(
-    //   `http://localhost:5001/api/events/${editingId}`,
-    //   { ...editRow, status: "updated" }
-    // );
   } catch (err) {
     console.error(err);
     fetchEvents(); // rollback if failed
@@ -410,7 +394,6 @@ const handleSelectAll = () => {
                   />
                 </th>
 
-                <th>EventID</th>
                 <th>Title</th>
                 <th>Description</th>
                 <th>Date</th>
@@ -458,19 +441,6 @@ const handleSelectAll = () => {
       onChange={() => toggleSelect(ev._id)}
     />
   </td>
-{/* EVENT ID */}
-<td>
-  {editingId === ev._id ? (
-    <input
-      className="form-control"
-      value={editRow.eventId}
-      disabled
-    />
-  ) : (
-    ev.eventId
-  )}
-</td>
-
 
   {/* TITLE */}
   <td>

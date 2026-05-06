@@ -2,11 +2,7 @@ const Events = require("../models/events.js");
 const { sendNotification } = require("../../notification-service/controllers/notificationController.js");
 const subscribers = require("../models/subscribers.js");
 const Registrations = require("../models/Registration.js");
-const jwt = require("jsonwebtoken");
 
-const generateUnsubToken = (email) => {
-  return jwt.sign({ email }, "SECRET_KEY", { expiresIn: "7d" });
-};
 
 const getNextEventId = async () => {
   const lastEvent = await Events.findOne()
@@ -66,16 +62,11 @@ const emailTemplate = async(status, event) => {
 const createMessage = (status, event) => {
   let subject, message = "";
   if (status === "created") {
-    subject = "New Event Created!";    
-
+    subject = "New Event Created!";
     message = `<p>Dear Subscriber,</p><p><strong>New Event Is Created!</strong></p>`
     + getEventBody(event) + 
     `<p>Thank you for being with us.</p>
-     <p>You can register here: <a href="http://localhost:5173/events/${event.eventId}/register">Event Registration</a></p>
-     
-
-    `;
-
+    <p>You can register here: <a href="http://localhost:5173/events/${event.eventId}/register">Event Registration</a></p>`;
 
   } else if (status === "updated") {
     subject = "Event Updated!";
@@ -134,23 +125,8 @@ exports.createEvent = async (req, res) => {
 
         const { subject, message } = createMessage("created", event);
         const results = await Promise.allSettled(
-            emails.map(email => {
-              const token = generateUnsubToken(email);
-              const unsubscribeLink = `http://localhost:5173/unsubscribe?token=${token}`;
-              // const unsubscribeLink = `http://localhost:5173/unsubscribe?email=${encodeURIComponent(email)}`;
-            
-              const finalMessage = `
-                ${message}
-                <hr/>
-                <p style="font-size:12px;color:gray;">
-                  If you no longer want to receive emails:
-                  <a href="${unsubscribeLink}">Unsubscribe</a>
-                </p>
-              `;
-            
-              return sendNotification(email, subject, finalMessage);
-            })
-          );
+          emails.map(email => sendNotification(email, subject, message))
+        );
 
         const successCount = results.filter(r => r.status === "fulfilled").length;
         const failCount = results.filter(r => r.status === "rejected").length;
