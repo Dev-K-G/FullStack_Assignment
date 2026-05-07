@@ -3,8 +3,10 @@ const router = express.Router();
 
 const { registerUser, getRegisteredUsers, exportRegistrations } = require("../controllers/registrationController.js");
 
-router.post("/:eventId", registerUser);
-router.get("/:eventId", getRegisteredUsers);
+const { verifyAdmin } = require("../middleware/auth.js");
 
-router.get("/export/:eventId", exportRegistrations); // For Download to Excel
+router.post("/:eventId", registerUser);
+router.get("/:eventId", verifyAdmin, getRegisteredUsers);
+
+router.get("/export/:eventId", verifyAdmin, exportRegistrations); // For Download to Excel
 module.exports = router;
