@@ -2,6 +2,8 @@ const jwt = require("jsonwebtoken");
 require("dotenv").config();
 
 exports.verifyAdmin = (req, res, next) => {
+    console.log("verify admin");
+    console.log("verify admin :",req," AND ",req.headers.authorization);
   const authHeader = req.headers.authorization;
 
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
@@ -9,6 +11,7 @@ exports.verifyAdmin = (req, res, next) => {
   }
 
   const token = authHeader.split(" ")[1];
+  console.log("VerifyAdmin : ", token);
 
   try {
     const decoded = jwt.verify(
@@ -19,6 +22,8 @@ exports.verifyAdmin = (req, res, next) => {
     if (decoded.role !== "admin") {
       return res.status(403).json({ message: "Not authorized" });
     }
+
+    console.log("VerifyAdmin : ", decoded);
 
     req.user = decoded;
     next();

@@ -11,7 +11,7 @@ const {
   updateEventStatus
 } = require("../controllers/eventController");
 
-router.post("/", verifyAdmin, createEvent);
+router.post("/", createEvent);
 
 router.get("/", getEvents);
 router.get("/:eventId", getEvent);

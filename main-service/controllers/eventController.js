@@ -5,7 +5,7 @@ const Registrations = require("../models/Registration.js");
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
 
-import axios from "../utils/axiosConfig";
+//const axios =  ("../utils/axiosConfig.js");
 const generateUnsubToken = (email) => {
   return jwt.sign({ email }, process.env.JWSKEY , { expiresIn: "7d" });
 };

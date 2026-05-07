@@ -11,7 +11,8 @@ export default function AdminLogin() {
         "http://localhost:5001/api/admin/login",
         form
       );
-
+      alert(`Login Data: ${JSON.stringify(res.data)}`);
+alert(`Success Login: ${res.data.token}`);
       localStorage.setItem("token", res.data.token);
       window.location.href = "/admin"; // redirect
     } catch (err) {

@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+//import axios from "axios";
 import { FaEdit, FaSave, FaTimes } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import "../styles/adminEvent.css"; // Import custom CSS for styling
-
+import axios from "../utils/axiosConfig.js";
+//import axios from "..../utils/a.js";
 
 export default function AdminEvents() {
   const today = new Date().toISOString().split("T")[0];
@@ -84,7 +85,9 @@ export default function AdminEvents() {
 
     if (Object.keys(validationErrors).length > 0) return;
 
-    await axios.post("http://localhost:5001/api/events", form);
+    await axios.post("http://localhost:5001/api/events", form)
+    //  .then(res => console.log("SUCCESS:", res.data))
+    //  .catch(err => console.log("ERROR:", err.response?.data || err.message));
 
     fetchEvents();
     resetForm();
