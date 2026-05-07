@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 //import axios from "axios";
-import { FaEdit, FaSave, FaTimes } from "react-icons/fa";
+import { FaEdit, FaSave, FaTimes, FaSyncAlt, FaSort } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import "../styles/adminEvent.css"; // Import custom CSS for styling
 import axios from "../utils/axiosConfig.js";
-//import axios from "..../utils/a.js";
+
 
 export default function AdminEvents() {
   const today = new Date().toISOString().split("T")[0];
@@ -137,11 +137,11 @@ const filteredEvents = events.filter((ev) => {
   return matchesSearch && matchesType;
 });
 
-//Pagination
-const indexOfLast = currentPage * eventsPerPage;
-const indexOfFirst = indexOfLast - eventsPerPage;
-const currentEvents = filteredEvents.slice(indexOfFirst, indexOfLast);
-const totalPages = Math.ceil(filteredEvents.length / eventsPerPage);
+// //Pagination
+// const indexOfLast = currentPage * eventsPerPage;
+// const indexOfFirst = indexOfLast - eventsPerPage;
+// const currentEvents = filteredEvents.slice(indexOfFirst, indexOfLast);
+// const totalPages = Math.ceil(filteredEvents.length / eventsPerPage);
 
 
 //SAVE RowEdit
@@ -259,13 +259,68 @@ const handleSelectAll = () => {
     }
   };
 
-  const isValid =
+
+  //Sort by EventId
+  const [sortConfig, setSortConfig] = useState({
+    key: null,
+    direction: null
+  });
+const requestSort = (key) => {
+  let direction = "asc";
+  // asc -> desc
+  if (sortConfig.key === key && sortConfig.direction === "asc") {
+    direction = "desc";
+    setSortConfig({ key, direction });
+  // desc -> default
+  } else if (
+    sortConfig.key === key &&
+    sortConfig.direction === "desc"
+  ) {
+    setSortConfig({ key: null, direction: null });
+  // default -> asc
+  } else {
+    setSortConfig({ key, direction });
+  }
+};
+// SORTING
+const sortedEvents = [...filteredEvents].sort((a, b) => {
+  // DEFAULT / CLEAR SORT
+  if (!sortConfig.key) return 0;
+
+  let aValue = a[sortConfig.key];
+  let bValue = b[sortConfig.key];
+
+  // Handle numbers properly
+  if (!isNaN(aValue) && !isNaN(bValue)) {
+    aValue = Number(aValue);
+    bValue = Number(bValue);
+  }
+
+  if (aValue < bValue) {
+    return sortConfig.direction === "asc" ? -1 : 1;
+  }
+
+  if (aValue > bValue) {
+    return sortConfig.direction === "asc" ? 1 : -1;
+  }
+
+  return 0;
+});
+
+// PAGINATION
+const indexOfLast = currentPage * eventsPerPage;
+const indexOfFirst = indexOfLast - eventsPerPage;
+const currentEvents = sortedEvents.slice(indexOfFirst, indexOfLast);
+const totalPages = Math.ceil(sortedEvents.length / eventsPerPage);
+const isValid =
     form.title &&
     form.description &&
     form.date &&
     form.time &&
     form.venue &&
     Object.values(errors).every((e) => !e);
+
+
 
   return (
     <div className="container py-4">
@@ -415,7 +470,57 @@ const handleSelectAll = () => {
                   />
                 </th>
 
-                <th>EventID</th>
+                {/* <th onClick={() => requestSort('eventId')} style={{ cursor: 'pointer' }}>
+                  EventID {sortConfig.key === 'eventId' ? (sortConfig.direction === 'asc' ? '🔼' : '🔽') : ''}</th> */}
+                <th>
+  <div className="d-flex align-items-center gap-2">
+
+    {/* SORTABLE TITLE */}
+    <span
+      onClick={() => requestSort("eventId")}
+      style={{
+        cursor: "pointer",
+        userSelect: "none",
+        display: "flex",
+        alignItems: "center",
+        gap: "5px"
+      }}
+    >
+      EventID
+
+      {sortConfig.key === "eventId" ? (
+        sortConfig.direction === "asc" ? (
+          <span>🔼</span>
+        ) : sortConfig.direction === "desc" ? (
+          <span>🔽</span>
+        ) : (
+          <FaSort />
+        )
+      ) : (
+        <FaSort />
+      )}
+    </span>
+
+    {/* CLEAR SORT */}
+    {sortConfig.key && (
+      <FaSyncAlt
+        title="Clear Sort"
+        style={{
+          cursor: "pointer",
+          color: "#0d6efd",
+          fontSize: "14px"
+        }}
+        onClick={() =>
+          setSortConfig({
+            key: null,
+            direction: null
+          })
+        }
+      />
+    )}
+
+  </div>
+</th>
                 <th>Title</th>
                 <th>Description</th>
                 <th>Date</th>
