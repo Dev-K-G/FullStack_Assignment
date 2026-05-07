@@ -12,21 +12,23 @@ axios.interceptors.request.use(
     return Promise.reject(error);
   }
 );
-// // RESPONSE INTERCEPTOR (handle auth errors) OR WHEN TOKEN EXPIRES
-// axios.interceptors.response.use(
-//   (response) => response, // success → pass through
 
-//   (err) => {
-//     if (err.response?.status === 401) {
-//       console.log("Token expired or unauthorized");
 
-//       localStorage.removeItem("token");
-//       window.location.href = "/login";
-//     }
+// RESPONSE INTERCEPTOR (handle auth errors) OR WHEN TOKEN EXPIRES
+axios.interceptors.response.use(
+  (response) => response, // success → pass through
 
-//     return Promise.reject(err);
-//   }
-// );
+  (err) => {
+    if (err.response?.status === 401) {
+      console.log("Token expired or unauthorized");
+
+      localStorage.removeItem("token");
+      window.location.href = "/login";
+    }
+
+    return Promise.reject(err);
+  }
+);
 
 export default axios;
 

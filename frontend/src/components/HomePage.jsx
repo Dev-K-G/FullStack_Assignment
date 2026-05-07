@@ -15,7 +15,7 @@ export default function Home() {
           backgroundImage: "url('../assets/event-bg-2.jpg')",
           backgroundSize: "cover",
           backgroundPosition: "center",
-          filter: "blur(10px) brightness(0.7)",
+          filter: "blur(3px) brightness(0.7)",
           transform: "scale(1.1)"
         }}
       />
