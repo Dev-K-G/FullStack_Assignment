@@ -436,26 +436,26 @@ paths:
         '200':
           description: List of registered users
 
-  /registrations/export/{eventId}:
-    get:
-      tags:
-        - Registrations
-      summary: Export registrations to Excel
+  # /registrations/export/{eventId}:
+  #   get:
+  #     tags:
+  #       - Registrations
+  #     summary: Export registrations to Excel
 
-      parameters:
-        - in: path
-          name: eventId
-          required: true
-          schema:
-            type: integer
-            example: 1
+  #     parameters:
+  #       - in: path
+  #         name: eventId
+  #         required: true
+  #         schema:
+  #           type: integer
+  #           example: 1
 
-      responses:
-        '200':
-          description: Excel file download
+  #     responses:
+  #       '200':
+  #         description: Excel file download
 
-        '404':
-          description: No registrations found
+  #       '404':
+  #         description: No registrations found
 
   #################################
   # SUBSCRIBERS
