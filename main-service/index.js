@@ -55,7 +55,7 @@ app.use("/api/admin", adminRoutes);
 
 const PORT = process.env.PORT || 5001;
 
-const swaggerDocument = YAML.load('docs/registration.yaml');
+const swaggerDocument = YAML.load('./docs/EventRegistrationSystem.yaml');
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use((req, res, next) => {
   const error = new Error("Not found");

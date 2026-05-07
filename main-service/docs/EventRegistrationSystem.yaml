@@ -1,0 +1,495 @@
+openapi: 3.0.0
+
+info:
+  title: Event Management API
+  version: 1.0.0
+  description: API documentation for Admin, Events, Registration, and Subscribers modules.
+
+servers:
+  - url: http://localhost:5001/api
+    description: Local Development Server
+
+tags:
+  - name: Admin
+  - name: Events
+  - name: Registrations
+  - name: Subscribers
+
+components:
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    isAdminHeader:
+      in: header
+      name: isAdmin
+      required: true
+      schema:
+        type: boolean
+        example: true
+
+  schemas:
+
+    AdminLogin:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          example: admin@test.com
+        password:
+          type: string
+          example: admin123
+
+    Event:
+      type: object
+      properties:
+        _id:
+          type: string
+          example: 69fb349e60246caf3216748b
+        eventId:
+          type: integer
+          example: 1
+        title:
+          type: string
+          example: Tech Conference 2026
+        description:
+          type: string
+          example: Annual technology conference
+        date:
+          type: string
+          example: 2026-05-10
+        time:
+          type: string
+          example: 10:00 AM
+        venue:
+          type: string
+          example: Zurich Hall
+        event:
+          type: string
+          enum:
+            - Tech Talk
+            - Workshop
+            - Seminar
+          example: Tech Talk
+        status:
+          type: string
+          enum:
+            - active
+            - cancelled
+            - updated
+            - deleted
+          example: active
+
+    CreateEvent:
+      type: object
+      required:
+        - title
+        - description
+        - date
+        - time
+        - venue
+        - event
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        date:
+          type: string
+        time:
+          type: string
+        venue:
+          type: string
+        event:
+          type: string
+          enum:
+            - Tech Talk
+            - Workshop
+            - Seminar
+          example: Tech Talk
+
+    Registration:
+      type: object
+      properties:
+        name:
+          type: string
+          example: John Doe
+        email:
+          type: string
+          example: john@example.com
+        phone:
+          type: string
+          example: "+91791234567"
+        notify:
+          type: boolean
+          example: true
+        event:
+          type: string
+          enum:
+            - Tech Talk
+            - Workshop
+            - Seminar
+          example: Tech Talk
+        eventId:
+          type: integer
+          example: 1
+
+    Subscriber:
+      type: object
+      properties:
+        email:
+          type: string
+          example: user@example.com
+
+paths:
+
+  #################################
+  # ADMIN
+  #################################
+
+  /admin/login:
+    post:
+      tags:
+        - Admin
+      summary: Admin Login
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminLogin'
+
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                  isAdmin:
+                    type: boolean
+                    example: true
+
+        '401':
+          description: Invalid credentials
+
+  #################################
+  # EVENTS
+  #################################
+
+  /events:
+    get:
+      tags:
+        - Events
+      summary: Get all events
+
+      responses:
+        '200':
+          description: List of events
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Event'
+
+    post:
+      tags:
+        - Events
+      summary: Create new event
+
+      security:
+        - bearerAuth: []
+
+      parameters:
+        - $ref: '#/components/parameters/isAdminHeader'
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateEvent'
+
+      responses:
+        '201':
+          description: Event created successfully
+
+        '401':
+          description: Unauthorized
+
+  /events/{eventId}:
+    get:
+      tags:
+        - Events
+      summary: Get event by Event ID
+
+      parameters:
+        - in: path
+          name: eventId
+          required: true
+          schema:
+            type: integer
+            example: 2
+
+      responses:
+        '200':
+          description: Event details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Event'
+
+        '404':
+          description: Event not found
+
+  /events/{eventId}/register:
+    get:
+      tags:
+        - Events
+      summary: Get event for registration page
+
+      parameters:
+        - in: path
+          name: eventId
+          required: true
+          schema:
+            type: integer
+            example: 1
+
+      responses:
+        '200':
+          description: Event details
+
+  /events/{editingId}:
+    put:
+      tags:
+        - Events
+      summary: Update event
+
+      security:
+        - bearerAuth: []
+
+      parameters:
+        - $ref: '#/components/parameters/isAdminHeader'
+
+        - in: path
+          name: editingId
+          required: true
+          schema:
+            type: string
+            format: objectid
+            pattern: '^[0-9a-fA-F]{24}$'
+            example: '69fb46d3c934d95ab7369f2d'
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateEvent'
+
+      responses:
+        '200':
+          description: Event updated successfully
+
+  /events/{id}:
+    delete:
+      tags:
+        - Events
+      summary: Delete event
+
+      security:
+        - bearerAuth: []
+
+      parameters:
+        - $ref: '#/components/parameters/isAdminHeader'
+
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: objectid
+            pattern: '^[0-9a-fA-F]{24}$'
+            example: '69fb46d3c934d95ab7369f2d'
+
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  enum:
+                    - active
+                    - cancelled
+                    - updated
+                    - deleted
+                  example: cancelled
+                     
+                                     
+                  
+
+      responses:
+        '200':
+          description: Event deleted
+
+  /events/status/{_id}:
+    put:
+      tags:
+        - Events
+      summary: Update event status
+
+      security:
+        - bearerAuth: []
+
+      parameters:
+        - $ref: '#/components/parameters/isAdminHeader'
+
+        - in: path
+          name: _id
+          required: true
+          schema:
+            type: string
+            format: objectid
+            pattern: '^[0-9a-fA-F]{24}$'
+            example: '69fb46d3c934d95ab7369f2d'
+
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  enum:
+                    - active
+                    - cancelled
+                    - updated
+                    - deleted
+                  example: active
+                eventId:
+                  type: integer
+                  example: 1
+
+      responses:
+        '200':
+          description: Event status updated
+
+  #################################
+  # REGISTRATIONS
+  #################################
+
+  /registrations/{eventId}:
+    post:
+      tags:
+        - Registrations
+      summary: Register user for event
+
+      parameters:
+        - in: path
+          name: eventId
+          required: true
+          schema:
+            type: integer
+            example: 2
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Registration'
+
+      responses:
+        '200':
+          description: Registration successful
+
+    get:
+      tags:
+        - Registrations
+      summary: Get registered users for event
+
+      parameters:
+        - in: path
+          name: eventId
+          required: true
+          schema:
+            type: integer
+            example: 1
+
+      responses:
+        '200':
+          description: List of registered users
+
+  /registrations/export/{eventId}:
+    get:
+      tags:
+        - Registrations
+      summary: Export registrations to Excel
+
+      parameters:
+        - in: path
+          name: eventId
+          required: true
+          schema:
+            type: integer
+            example: 1
+
+      responses:
+        '200':
+          description: Excel file download
+
+        '404':
+          description: No registrations found
+
+  #################################
+  # SUBSCRIBERS
+  #################################
+
+  # /subscribers:
+  #   get:
+  #     tags:
+  #       - Subscribers
+  #     summary: Get all subscribers
+
+  #     responses:
+  #       '200':
+  #         description: Subscriber list
+
+  # /subscribers/unsubscribe/{token}:
+  #   delete:
+  #     tags:
+  #       - Subscribers
+  #     summary: Unsubscribe email using token
+
+  #     parameters:
+  #       - in: path
+  #         name: token
+  #         required: true
+  #         schema:
+  #           type: string
+
+  #     responses:
+  #       '200':
+  #         description: Unsubscribed successfully
+
+  #       '400':
+  #         description: Invalid or expired token
+  
+  /subscribers/unsubscribe/{token}:
+    description: This API in backend generates token from Email of subscriber and deletes (unsubscribes) that subscriber.

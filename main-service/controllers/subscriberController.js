@@ -28,5 +28,10 @@ exports.unsubscribe = async (req, res) => {
 };
 
 exports.getSubscribers = async(req, res) => {
-
+  try {
+      const users = await subscribers.find();
+      res.json(users);
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
 };

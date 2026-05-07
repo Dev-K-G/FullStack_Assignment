@@ -13,7 +13,7 @@ exports.registerUser = async (req, res) => {
     const { name, email, event, notify, eventId } = req.body || {};
     // const { eventId } = req.params.eventId || {};
     const userEmail =  String(req.body.email || "").trim().toLowerCase();
-console.log("Sanitized email:", email);
+      //console.log("Sanitized email:", email);
     const registration = await Registration.create({      
       name:name.trim(), // sanitize name
       email:email.trim().toLowerCase(), // normalize email
