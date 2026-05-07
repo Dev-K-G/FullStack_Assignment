@@ -13,4 +13,4 @@ const RegistrationSchema = new mongoose.Schema({
   }
 }, {versionKey: false});
 
-module.exports = mongoose.model("Registration", RegistrationSchema);
+module.exports = mongoose.model("Registrations", RegistrationSchema);
