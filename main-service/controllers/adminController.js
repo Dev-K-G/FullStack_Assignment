@@ -35,7 +35,7 @@ console.log("isMatch Login : ",isMatch);
   const token = jwt.sign(
     { role: "admin", email },
     process.env.JWSKEY,
-    { expiresIn: "1m" }
+    { expiresIn: "1d" }
   );
 
   //isAdmin: user.username === "admin@site.com"    //email

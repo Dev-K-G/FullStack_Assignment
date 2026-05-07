@@ -19,7 +19,7 @@ export default function AdminEvents() {
   const [currentPage, setCurrentPage] = useState(1);
   const eventsPerPage = 5;
 
-  const [form, setForm] = useState({
+  const [form, setForm] = useState({    
     title: "",
     description: "",
     date: today,
@@ -89,6 +89,7 @@ export default function AdminEvents() {
     //  .then(res => console.log("SUCCESS:", res.data))
     //  .catch(err => console.log("ERROR:", err.response?.data || err.message));
 
+    alert('Event Created');
     fetchEvents();
     resetForm();
   };
@@ -125,9 +126,10 @@ const validateEdit = () => {
 //Sear, Filter Table
 const filteredEvents = events.filter((ev) => {
   const matchesSearch =
-    ev.title.toLowerCase().includes(search.toLowerCase()) ||
-    ev.description.toLowerCase().includes(search.toLowerCase()) ||
-    ev.venue.toLowerCase().includes(search.toLowerCase());
+    ev.title?.toLowerCase().includes(search.toLowerCase()) ||
+    ev.description?.toLowerCase().includes(search.toLowerCase()) ||
+    ev.venue?.toLowerCase().includes(search.toLowerCase()) ||
+    ev.eventId?.toString().toLowerCase().includes(search.toLowerCase());
 
   const matchesType =
     filterType === "All" || ev.event === filterType;
@@ -153,7 +155,7 @@ const saveEdit = async () => {
   const updatedEvents = events.map((ev) =>
     ev._id === editingId ? { ...editRow } : ev    
   );
-editRow.status=="updated";
+editRow.status ="updated";
   setEvents(updatedEvents);
   // try{
   //   updateStatusForSelected("updated");
@@ -161,10 +163,8 @@ editRow.status=="updated";
   // catch (err) {
   //   console.error(err);
   //   fetchEvents(); // rollback if failed
-  // }
+  // } 
   
-  alert("Saving edit:", editingId, editRow.status);
-
   try {
     const {eventId, ...safeData} = editRow; // Exclude eventId from the update payload
     await axios.put(
@@ -176,6 +176,7 @@ editRow.status=="updated";
     //   `http://localhost:5001/api/events/${editingId}`,
     //   { ...editRow, status: "updated" }
     // );
+    alert('Saved');
   } catch (err) {
     console.error(err);
     fetchEvents(); // rollback if failed

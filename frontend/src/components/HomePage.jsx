@@ -97,7 +97,7 @@ export default function Home() {
                   </h1>
 
                   <p className="text-light mb-4">
-                    Join workshops, seminars, and professional events.
+                    Join workshops, seminars and professional events.
                   </p>
 
                   <a href="/events" className="btn btn-primary px-4 py-2">
