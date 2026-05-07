@@ -41,10 +41,10 @@ export default function AdminLogin() {
       style={{
         position: "absolute",
         inset: 0,
-        backgroundImage: "url('../assets/admin-bg.jpg')",
+        backgroundImage: "url('../assets/admin-bg-2.jpg')",
         // backgroundSize: "cover",
         backgroundPosition: "center",
-        filter: "blur(3px) brightness(0.6)",
+        filter: "blur(2px) brightness(0.6)",
         transform: "scale(1.1)",
       }}
     />
