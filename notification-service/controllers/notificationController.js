@@ -6,8 +6,8 @@ const frompass=process.env.email_pass;
 //const subject = "Confirmation of Event Registration";
 //const message = "Your registration is confirmed!!"
 
-console.log("Email User:", fromuser);
-console.log("Email Pass:", frompass);
+//console.log("Email User:", fromuser);
+//console.log("Email Pass:", frompass);
 
 // SMTP Transport (Gmail + App Password)
 const smtpClient = nodemailer.createTransport({
@@ -28,9 +28,7 @@ smtpClient.verify((err, success) => {
 
 // Send Email Function
 async function sendEmail(touser, emailSubject, message) {
-  try {
-    console.log(`Attempting to send email to ${touser} with subject "${emailSubject}"`);
-    console.log("Email content:", message);
+  try {    
     const result = await smtpClient.sendMail({
       from: fromuser,
       to: touser,
@@ -41,7 +39,6 @@ async function sendEmail(touser, emailSubject, message) {
           <p>${message}</p>
 
           <p>If you have any questions, feel free to reply to this email.</p>
-
           <br/>
           <p>Best Regards,<br/>Event Team</p>
         </div>
@@ -61,17 +58,6 @@ async function sendEmail(touser, emailSubject, message) {
 //   "receiver@example.com"
 // );
 
-// exports.sendNotification = async (req, res) => {
-//     const { email, message } = req.body;
-
-//     try {
-//         await sendEmail(email);
-//         res.status(200).json({ message: "Notification sent successfully" });
-//     } catch (error) {
-//         console.error("❌ Failed to send notification:", error.message);
-//         res.status(500).json({ error: "Failed to send notification" });
-//     }
-// };
 const sendNotification = async (touser, emailSubject,message) => {
   return sendEmail(
     touser,

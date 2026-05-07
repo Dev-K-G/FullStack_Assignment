@@ -5,7 +5,7 @@ const Registrations = require("../models/Registration.js");
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
 
-//const axios =  ("../utils/axiosConfig.js");
+
 const generateUnsubToken = (email) => {
   return jwt.sign({ email }, process.env.JWSKEY , { expiresIn: "7d" });
 };
@@ -26,18 +26,8 @@ const getAllSubscribers = async () => {
 
 let subEmails = Array.isArray(subs)
   ? subs.map(u => u.email?.trim().toLowerCase()).filter(Boolean)
-  : [];
-    // if (!Array.isArray(subs) || subs.length === 0) {
-    //   console.log("No subscribers found");
-    //   return [];
-    // }
-    // return subs
-    //   .map(u => u.email)
-    //   .filter(Boolean)
-    //   .map(e => e.trim().toLowerCase());
-
+  : [];    
     return subEmails;
-
   } catch (err) {
     console.error("Error fetching subscribers:", err.message);
     return []; 
@@ -78,7 +68,7 @@ const getEventBody = (event) => {
 };
 
 const emailTemplate = async(status, event) => {
-  console.log("Preparing email template for status:", status, "and event:", event);
+  //console.log("Preparing email template for status:", status, "and event:", event);
   const emails = await getEmails(status, event.eventId);
 
       if(emails && emails.length > 0)
@@ -103,12 +93,7 @@ const createMessage = (status, event) => {
     message = `<p>Dear Subscriber,</p><p><strong>New Event Is Created!</strong></p>`
     + getEventBody(event) + 
     `<p>Thank you for being with us.</p>
-     <p>You can register here: <a href="http://localhost:5173/events/${event.eventId}/register">Event Registration</a></p>
-     
-
-    `;
-
-
+     <p>You can register here: <a href="http://localhost:5173/events/${event.eventId}/register">Event Registration</a></p>`;
   } else if (status === "updated") {
     subject = "Event Updated!";
     message = `<p>Dear User,</p><p><strong>Please Note: Below Event Has Been Updated!</strong></p>`
@@ -119,11 +104,9 @@ const createMessage = (status, event) => {
           subject = "Event Cancelled!";
           message = `<p>Dear User,</p><p><strong>We regret to inform you that the following event has been cancelled.</strong></p>`
             + getEventBody(event) + 
-            `<p>We apologize for any inconvenience caused.</p>`;
-          
+            `<p>We apologize for any inconvenience caused.</p>`;          
         }
-
-  console.log("Generated message for status:", status, "\nSubject:", subject, "\nMessage:", message);
+  //console.log("Generated message for status:", status, "\nSubject:", subject, "\nMessage:", message);
   return { subject, message };
 };
 
@@ -177,9 +160,7 @@ exports.createEvent = async (req, res) => {
                 <p style="font-size:12px;color:gray;">
                   If you no longer want to receive emails:
                   <a href="${unsubscribeLink}">Unsubscribe</a>
-                </p>
-              `;
-            
+                </p>`;            
               return sendNotification(email, subject, finalMessage);
             })
           );
@@ -287,11 +268,7 @@ exports.updateEventStatus = async (req, res) => {
   try {
     console.log("Received status update request:", req.params._id, req.body);
     const { status } = req.body.status ? req.body.status : "active" ;
-//     await Events.findByIdAndUpdate(
-//   {_id: req.params._id},
-//   req.body,
-//   { new: true }
-// );
+
 //res.json({ message: "Event updated" });
   res.json(event);   
 

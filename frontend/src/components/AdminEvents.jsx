@@ -78,8 +78,7 @@ export default function AdminEvents() {
     setErrors({});
   };
 
-  const createEvent = async () => {
-    console.log("Creating event with data:", form);
+  const createEvent = async () => {    
     const validationErrors = validate();
     setErrors(validationErrors);
 

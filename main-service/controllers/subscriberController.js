@@ -6,12 +6,12 @@ exports.unsubscribe = async (req, res) => {
   try {
     const { token } = req.params;
 
-    console.log("TOKEN:", token);
+    //console.log("TOKEN:", token);
 
 
     const decoded = jwt.verify(token, process.env.JWSKEY);
 
-    console.log("DECODED:", decoded);
+    //console.log("DECODED:", decoded);
 
     const email = decoded.email;
 
@@ -28,5 +28,5 @@ exports.unsubscribe = async (req, res) => {
 };
 
 exports.getSubscribers = async(req, res) => {
-console.log('Here in getSubscribers');
+
 };

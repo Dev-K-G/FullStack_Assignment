@@ -11,19 +11,16 @@ const {
   updateEventStatus
 } = require("../controllers/eventController");
 
-router.post("/", createEvent);
 
 router.get("/", getEvents);
 router.get("/:eventId", getEvent);
 router.get("/:eventId/register", getEvent);
 
+// protect create/update/delete
+router.post("/", verifyAdmin, createEvent);
 router.put("/:editingId", verifyAdmin, updateEvent);
 router.put("/:_id", verifyAdmin, updateEventStatus);
 router.delete("/:id", verifyAdmin, deleteEvent);
 
-// protect create/update/delete
-// router.post("/", verifyAdmin, createEvent);
-// router.put("/:id", verifyAdmin, updateEvent);
-// router.delete("/:id", verifyAdmin, deleteEvent);
 
 module.exports = router;

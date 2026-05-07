@@ -46,13 +46,13 @@ export default function App() {
       )}
 
           {localStorage.getItem("isAdmin") === "true" && (
-            // <Link to="/admin">Admin Panel</Link>
-            <span style={{ 
-  color: 'blue', 
-  textDecoration: 'underline'
-}}>
-  Admin Panel
-</span>
+            <Link to="/admin">Admin Panel</Link>
+//             <span style={{ 
+//   color: 'blue', 
+//   textDecoration: 'underline'
+// }}>
+//   Admin Panel
+// </span>
           )}
 
         </div>

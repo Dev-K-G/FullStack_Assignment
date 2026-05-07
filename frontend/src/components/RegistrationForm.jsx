@@ -63,8 +63,7 @@ export default function RegisterForm() {
 
     if (Object.keys(validationErrors).length > 0) return;
 
-    try {
-      console.log("Submitting form:", form);
+    try {     
       
       await axios.post(`http://localhost:5001/api/register/${eventId}`, {...form, eventId: parseInt(eventId) });
       setSuccess(true);
