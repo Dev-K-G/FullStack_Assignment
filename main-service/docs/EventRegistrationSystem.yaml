@@ -323,26 +323,8 @@ paths:
             type: string
             format: objectid
             pattern: '^[0-9a-fA-F]{24}$'
-            example: '69fb46d3c934d95ab7369f2d'
-
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                status:
-                  type: string
-                  enum:
-                    - active
-                    - cancelled
-                    - updated
-                    - deleted
-                  example: cancelled
-                     
-                                     
-                  
-
+            example: '69fb46d3c934d95ab7369f2d'                      
+      
       responses:
         '200':
           description: Event deleted
