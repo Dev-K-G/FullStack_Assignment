@@ -11,6 +11,7 @@ const generateUnsubToken = (email) => {
 };
 
 const getNextEventId = async () => {
+  try{
   const lastEvent = await Events.findOne()
     .sort({ eventId: -1 })
     .lean();
@@ -18,6 +19,10 @@ const getNextEventId = async () => {
   const lastId = Number(lastEvent?.eventId);
 
   return Number.isFinite(lastId) ? lastId + 1 : 1;
+}catch (err) {
+    console.error("Error fetching subscribers:", err.message);
+    return 1; 
+  }
 };
 
 const getAllSubscribers = async () => {

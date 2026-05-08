@@ -8,7 +8,7 @@ export default function RegisterForm() {
     name: "",
     email: "",
     phone: "",
-    event: "",
+    //event: "",
     notify: false
   });
 
@@ -168,6 +168,7 @@ export default function RegisterForm() {
                 </label>
                 <input
                   className="form-control"
+                  maxLength={50}
                   value={form.name}
                   onChange={(e) => {
                     setForm({ ...form, name: e.target.value });

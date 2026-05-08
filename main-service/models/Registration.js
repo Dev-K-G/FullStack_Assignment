@@ -5,7 +5,7 @@ const RegistrationSchema = new mongoose.Schema({
   name: String,
   email: String,
   phone: Number,
-  event: String,
+  //event: String,
   notify: Boolean,
   createdAt: {
     type: Date,

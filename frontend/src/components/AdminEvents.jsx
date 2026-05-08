@@ -33,9 +33,9 @@ export default function AdminEvents() {
   const fetchEvents = async () => {
     const res = await axios.get("http://localhost:5001/api/events");
 
-  const sorted = res.data.sort((a, b) => {
-    const dateA = new Date(`${a.date?.slice(0, 10)}T${a.time || "00:00"}`);
-    const dateB = new Date(`${b.date?.slice(0, 10)}T${b.time || "00:00"}`);
+    const sorted = res.data.sort((a, b) => {
+      const dateA = new Date('${a.date?.slice(0, 10)}T${a.time || "00:00"}');
+      const dateB = new Date('${b.date?.slice(0, 10)}T${b.time || "00:00"}');
 
     return dateA.getTime() - dateB.getTime(); // ascending (new → old)
   });
@@ -84,7 +84,7 @@ export default function AdminEvents() {
 
     if (Object.keys(validationErrors).length > 0) return;
 
-    await axios.post("http://localhost:5001/api/events", form)
+    await axios.post("http://localhost:5001/api/events", form);
     //  .then(res => console.log("SUCCESS:", res.data))
     //  .catch(err => console.log("ERROR:", err.response?.data || err.message));
 
@@ -457,6 +457,7 @@ const isValid =
     <option value="Seminar">Seminar</option>
   </select>
 </div>
+        <div className="table-responsive">
           <table className="table table-hover align-middle admin-table">
 
             <thead className="table-dark">
@@ -721,6 +722,7 @@ const isValid =
             </tbody>
 
           </table>
+          </div>
         </div>
 
               <div className="d-flex justify-content-center mt-3 gap-2 align-items-center">

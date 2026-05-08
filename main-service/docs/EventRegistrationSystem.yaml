@@ -115,7 +115,7 @@ components:
             - Seminar
           example: Tech Talk
 
-    Registration:
+    Register:
       type: object
       properties:
         name:
@@ -129,14 +129,7 @@ components:
           example: "+91791234567"
         notify:
           type: boolean
-          example: true
-        event:
-          type: string
-          enum:
-            - Tech Talk
-            - Workshop
-            - Seminar
-          example: Tech Talk
+          example: true        
         eventId:
           type: integer
           example: 1
@@ -331,7 +324,7 @@ paths:
  
 
   #################################
-  # REGISTRATIONS
+  # REGISTER
   #################################
 
   /register/{eventId}:
@@ -353,7 +346,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Registration'
+              $ref: '#/components/schemas/Register'
 
       responses:
         '200':
@@ -439,5 +432,5 @@ paths:
   #       '400':
   #         description: Invalid or expired token
   
-  /subscribers/unsubscribe/{token}:
-    description: This API in backend generates token from Email of subscriber and deletes (unsubscribes) that subscriber.
+  # /subscribers/unsubscribe/{token}:
+  #   description: This API in backend generates token from Email of subscriber and deletes (unsubscribes) that subscriber.
