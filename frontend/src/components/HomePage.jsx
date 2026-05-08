@@ -26,7 +26,7 @@ export default function Home() {
                 <div className="black-core">
 
                   <h1 className="home-title">
-                    Event Registration System
+                    Event Registration And Management System
                   </h1>
 
                   <p className="home-text">
