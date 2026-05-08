@@ -1,20 +1,65 @@
+/* TABLE RESPONSIVE FIX */
 .admin-table {
-  table-layout: fixed;
   width: 100%;
+  table-layout: auto;
+  word-wrap: break-word;
 }
 
+/* CELL STYLING */
 .admin-table th,
 .admin-table td {
   vertical-align: middle;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  white-space: normal;
+  word-break: break-word;
+  max-width: 220px;
+  font-size: 14px;
 }
 
-/* Description column (make it readable but controlled) */
-.col-desc {
-  max-width: 250px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+/* DESCRIPTION COLUMN */
+.admin-table td:nth-child(4) {
+  min-width: 220px;
+}
+
+/* INPUTS INSIDE TABLE */
+.admin-table input,
+.admin-table textarea,
+.admin-table select {
+  min-width: 120px;
+  width: 100%;
+}
+
+/* MOBILE RESPONSIVE */
+@media (max-width: 768px) {
+  .admin-table th,
+  .admin-table td {
+    font-size: 12px;
+    padding: 8px;
+  }
+
+  .admin-table td {
+    max-width: 150px;
+  }
+
+  /* Smaller buttons/icons */
+  .admin-table svg {
+    font-size: 14px;
+  }
+
+  /* Reduce input sizes */
+  .admin-table input,
+  .admin-table select {
+    font-size: 12px;
+    padding: 4px;
+  }
+}
+
+/* EXTRA SMALL DEVICES */
+@media (max-width: 576px) {
+  .table-responsive {
+    overflow-x: auto;
+  }
+
+  .admin-table {
+    min-width: 900px;
+  }
 }
