@@ -402,15 +402,21 @@ paths:
   # SUBSCRIBERS
   #################################
 
-  # /subscribers:
-  #   get:
-  #     tags:
-  #       - Subscribers
-  #     summary: Get all subscribers
+  /subscribers:
+    get:
+      tags:
+        - Subscribers
+      summary: Get all subscribers
 
-  #     responses:
-  #       '200':
-  #         description: Subscriber list
+      security:
+        - bearerAuth: []
+
+      parameters:
+        - $ref: '#/components/parameters/isAdminHeader'
+
+      responses:
+        '200':
+          description: Subscriber list
 
   # /subscribers/unsubscribe/{token}:
   #   delete:

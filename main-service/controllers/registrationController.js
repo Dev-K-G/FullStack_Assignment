@@ -6,6 +6,7 @@ const subscribers = require("../models/Subscribers.js");
 const eventsModel = require("../models/Events.js");
 const { sendNotification } = require("../../notification-service/controllers/notificationController.js");
 const Registrations = require("../models/Registration.js");
+const { register } = require("node:module");
 
 exports.registerUser = async (req, res) => {
   try {
@@ -123,6 +124,28 @@ exports.exportRegistrations = async (req, res) => {
 
     await workbook.xlsx.write(res);
     res.end();
+
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+// DELETE ALL REGISTRATIONS FOR AN EVENT
+exports.deleteRegisteredUsers = async (req, res) => {
+  try {
+    console.log(
+      "Deleting registrations for eventId:",
+      req.params.eventId
+    );
+
+    const result = await Registration.deleteMany({
+      eventId: req.params.eventId
+    });
+
+    res.json({
+      message: "Event registrations deleted successfully",
+      deletedCount: result.deletedCount
+    });
 
   } catch (err) {
     res.status(500).json({ error: err.message });

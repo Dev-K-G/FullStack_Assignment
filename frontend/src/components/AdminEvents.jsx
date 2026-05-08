@@ -214,16 +214,34 @@ const handleSelectAll = () => {
     }
   };
 
-  const deleteSelected = async (action) => {
+const deleteSelected = async (action) => {
+  try {
     await Promise.all(
-      selected.map((id) =>
-        axios.delete(`http://localhost:5001/api/events/${id}`, { data: { status: action } })
-      )
+      selected.map(async (_id) => {
+
+        // find the event first
+        const event = events.find((e) => e._id === _id);
+        
+        if (!event) return;
+
+        // 1. delete event by ObjectId
+        await axios.delete(`http://localhost:5001/api/events/${_id}`, {
+          data: { status: action }
+        });
+
+        // 2. delete registrations by eventId (NOT ObjectId)
+        await axios.delete(
+          `http://localhost:5001/api/register/events/${event.eventId}`
+        );
+      })
     );
 
     setSelected([]);
     fetchEvents();
-  };
+  } catch (err) {
+    console.error("Error deleting event or registrations:", err);
+  }
+};
 
   // 🆕 CANCEL SELECTED (NEW)
   const cancelSelected = () => {
